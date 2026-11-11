@@ -37,7 +37,7 @@ En **WhatsApp → Configuration → Webhook**:
 - **Verify token:** el mismo `WHATSAPP_VERIFY_TOKEN`
 - Suscribirse al campo **messages**.
 
-Listo: Norma le escribe "hola" al número y el bot le contesta con los botones.
+Listo: Norma le escribe "hola" al número y el bot le contesta con los botones. Con crédito en el AI Gateway también entiende sus audios.
 
 ## Cómo se protege
 

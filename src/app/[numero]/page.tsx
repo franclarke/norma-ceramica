@@ -10,6 +10,13 @@ import { formatPrice } from "@/lib/bot/parse";
 
 const parse = (raw: string) => (/^\d{1,4}$/.test(raw) ? Number(raw) : null);
 
+// Las piezas que hay hoy salen pre-generadas (metadata en el <head>, carga instantánea);
+// las nuevas se generan la primera vez que alguien abre su link.
+export async function generateStaticParams() {
+  const store = await getPublicStore(NORMA);
+  return store.pieces.map((p) => ({ numero: String(p.number) }));
+}
+
 export async function generateMetadata({ params }: PageProps<"/[numero]">): Promise<Metadata> {
   const n = parse((await params).numero);
   if (n === null) return {};
