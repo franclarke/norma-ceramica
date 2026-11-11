@@ -44,7 +44,7 @@ No usa IA: el bot es determinístico, así cada respuesta es predecible y siempr
 
 La dirección visual salió de explorar tres mundos con composiciones generadas (una lámina escolar, un sobre de molde de costura y las tablillas de esmalte) y quedarse con el que mejor contaba el producto: los ceramistas numeran sus pruebas de esmalte grabando el número en el barro, igual que el "numerito" de Norma. Todo el proceso está en [`assets/`](assets/README.md) y [`.impeccable/`](.impeccable/).
 
-- Fondo de esmalte cobalto, con texto blanco a 12:1 de contraste.
+- Fondo de esmalte cobalto, con el texto blanco a más de 8:1 de contraste en cualquier punto del esmalte.
 - Tipografía **Atkinson Hyperlegible Next**, del Braille Institute, pensada para baja visión.
 - Logo y subrayado a pincel.
 - Las tablillas se hamacan sobre su clavo cuando las tocás.

@@ -1,0 +1,4 @@
+{
+  "prompt": "Generated with Codex CLI image_generation from assets/prompts/glaze-cobalt-v2.md; post-processed by assets/scripts/plates.mjs (tonal range compressed x0.36 toward rgb(10 28 140), single 1600px image). Prompt:\nSquare image, 1024x1024.\n\nSUBJECT: a real macro photograph, shot straight on, of a flat ceramic surface covered in a glossy, saturated COBALT BLUE glaze (bright royal cobalt, like a Delft or Talavera blue, mean colour close to #1C2A8E), filling the entire frame edge to edge. Fine crackle (crazing) lines across the whole surface, gentle pooling where the glaze is thicker and slightly darker, a few soft, diffuse gloss highlights from a large window light (never a sharp reflection of an object). Even overall brightness so white text stays readable on any part of it. No edges, no objects, no text, no vignette. It must look like a real fired glaze, not a digital texture.\n",
+  "createdAt": "2026-11-11T09:54:58.829Z"
+}

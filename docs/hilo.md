@@ -45,7 +45,7 @@ Los ceramistas hacen tablillas de prueba de esmalte y les graban un número en e
 **6/**
 Pensado para leer a los 70:
 - Atkinson Hyperlegible, la tipografía del Braille Institute para baja visión
-- letra grande y blanco sobre cobalto a 12:1
+- letra grande, con el blanco sobre el cobalto a más de 8:1 en cualquier punto
 - nada de hover, popups ni carruseles
 - al final, la lista en texto llano, por si es más fácil
 
