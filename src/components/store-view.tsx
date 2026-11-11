@@ -19,9 +19,12 @@ const updatedLabel = (iso: string) =>
 export function StoreView({ store, compact = false }: { store: PublicStore; compact?: boolean }) {
   const { pieces } = store;
   // Fondos que vienen por CSS: se avisan temprano para que no demoren la primera pantalla.
-  preload("/plates/glaze-cobalt.webp", { as: "image", fetchPriority: "high" });
-  preload("/plates/logo.webp", { as: "image", fetchPriority: "high" });
-  for (const p of pieces.slice(0, 2)) preload(`/plates/tile-${glazeOf(p.number)}.webp`, { as: "image", fetchPriority: "high" });
+  // (En la vista compacta del simulador no: vive en un iframe que a veces está oculto.)
+  if (!compact) {
+    preload("/plates/glaze-cobalt.webp", { as: "image", fetchPriority: "high" });
+    preload("/plates/logo.webp", { as: "image", fetchPriority: "high" });
+    for (const p of pieces.slice(0, 2)) preload(`/plates/tile-${glazeOf(p.number)}.webp`, { as: "image", fetchPriority: "high" });
+  }
   return (
     <div className={s.wall} data-compact={compact || undefined}>
       <header className={s.intro}>

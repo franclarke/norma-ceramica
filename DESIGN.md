@@ -129,7 +129,7 @@ Está pensada para compradores de unos 70 años en el celular. Por eso todo es g
 Un mundo de dos materiales: esmalte cobalto profundo para el fondo y barro crudo para las etiquetas, con un único acento ámbar reservado para foco, novedad y la acción de ver el cambio.
 
 ### Primary
-- **Esmalte Cobalto** (cobalt): color base bajo la textura `glaze-cobalt.webp` (720px, repetida) y `theme-color` del navegador. Contra el color plano, el blanco da 13.1:1; contra la textura, 7.9:1 en su punto más claro y 13.5:1 de promedio.
+- **Esmalte Cobalto** (cobalt): color base bajo la textura `glaze-cobalt.webp` (una sola imagen de 1600px, fija detrás del contenido con `body::before`, sin mosaico) y `theme-color` del navegador. Contra el color plano, el blanco da 13.1:1; contra la textura, 8.6:1 en su punto más claro.
 - **Cobalto de Horno** (cobalt-deep): fondo del `html` (se ve en el overscroll) y texto sobre la pestaña seleccionada (15.9:1 sobre blanco).
 
 ### Secondary
@@ -176,8 +176,8 @@ Una pared, no una grilla de tienda. Margen lateral `--gutter`.
 
 - **Celular (<640px):** una columna. Logo (min(62vw, 270px), proporción 698 / 333), saludo, bloque de contacto con el teléfono en su propia línea, fecha; la primera tablilla asoma en la primera pantalla. Las tablillas siguen verticales en celular: la variante apaisada se descartó porque achicaba la foto de la pieza.
 - **≥640px:** tablillas en 2 columnas.
-- **≥1024px:** columna izquierda de clamp(320px, 26vw, 420px) con el encabezado `sticky` (top 48px) y el logo a min(100%, 280px); la pared a la derecha, todavía en 2 columnas.
-- **≥1500px:** 3 columnas de tablillas.
+- **≥1024px:** columna izquierda de clamp(330px, 26vw, 420px) con el encabezado `sticky` (top 48px) y el logo a min(100%, 280px); la pared a la derecha, todavía en 2 columnas.
+- **≥1360px:** 3 columnas de tablillas.
 - Espacio entre tablillas: `tile-row-gap` vertical y `tile-col-gap` horizontal (el vertical es mayor: hay lugar para que se hamaquen). El dorso arranca a `section-break` y el pie a 56px.
 - **Simulador:** máximo 1180px centrado; dos celulares lado a lado desde 1024px. Debajo de eso, una pestaña "chat / página" y el botón ámbar "Ver cómo quedó la página" dentro del hilo cuando hay un cambio.
 
@@ -240,7 +240,7 @@ El chat del simulador usa los colores reales de WhatsApp a propósito, para que 
 - **Do** dar a todo control al menos 44px de alto (48px en el mundo de Norma) y foco visible ámbar (3px, offset 4px).
 - **Do** que toda acción y todo dato funcione sin hover: el hover sólo agrega el balanceo, que también responde al toque.
 - **Do** cortar todo movimiento con `prefers-reduced-motion: reduce` (animaciones y transiciones en `none`); las tablillas quedan quietas en su inclinación.
-- **Do** producir plates nuevas con `assets/scripts/plates.mjs`: losas de 720 × 821 con el barro en el 30% inferior; cobalto con rango tonal comprimido, espejado 2×2 para repetir sin costura.
+- **Do** producir plates nuevas con `assets/scripts/plates.mjs`: losas de 720 × 821 con el barro en el 30% inferior; cobalto con rango tonal comprimido (×0.36 hacia rgb(10 28 140)) en una sola imagen grande: nunca en mosaico, porque las manchas repetidas delatan el empapelado.
 - **Do** escribir en castellano rioplatense, con la voz de Norma.
 
 ### Don't:
@@ -249,5 +249,4 @@ El chat del simulador usa los colores reales de WhatsApp a propósito, para que 
 - **Don't** usar una segunda tipografía.
 - **Don't** usar los verdes y beiges de WhatsApp fuera del marco del chat del simulador.
 - **Don't** poner el número o el precio de una pieza como imagen: siempre texto real.
-- **Don't** simular relieve en el número de pieza con text-shadow: es tinta plana sobre el barro.
 - **Don't** marcar estado sólo con color: también con forma (punto, píldora, pestaña llena).
