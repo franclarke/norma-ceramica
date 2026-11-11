@@ -250,3 +250,10 @@ El chat del simulador usa los colores reales de WhatsApp a propósito, para que 
 - **Don't** usar los verdes y beiges de WhatsApp fuera del marco del chat del simulador.
 - **Don't** poner el número o el precio de una pieza como imagen: siempre texto real.
 - **Don't** marcar estado sólo con color: también con forma (punto, píldora, pestaña llena).
+
+## Agregados después de la revisión
+
+- **Pieza compartida (`/14`).** La página abre con un bloque de la pieza: el título "Te compartieron la pieza Nº 14" (step-1, 800), la misma tablilla del sistema (no una variante), y el pedido en la voz de Norma con el teléfono en negrita. En pantallas de menos de 1024px, la columna de presentación muestra solo el logo, para que la pieza entre en la primera pantalla. Si la pieza ya no está, se dice en una línea y sigue la pared.
+- **Imagen de la tablilla (`/api/tablilla/[store]/[n]`, 1200×630).** Se genera con `next/og`: la pared cobalto, la tablilla con su losa y su foto a la izquierda, y a la derecha el logo blanco, "Pieza Nº", el nombre (64px, 800) y el precio (72px, 800). Usa las mismas plates, convertidas a PNG porque Satori no lee WebP, y Atkinson Hyperlegible Next en TTF (`src/assets/fonts`). Es la vista previa de los links y la respuesta "Así quedó en tu página" del bot.
+- **Audio en el simulador (excepción WhatsApp).** El micrófono reemplaza al botón de enviar cuando el campo está vacío. Mientras graba, muestra un punto rojo #e53935 que late cada 1,2s, el tiempo en cifras tabulares y dos botones: Cancelar y Mandar. La burbuja de un audio arranca con "Audio · lo que entendí:" en el verde #008069 de WhatsApp, a 0.95rem.
+- **Las tablillas son imágenes optimizadas** (`next/image` con `fill`, AVIF y tamaños por pantalla), no fondos CSS. La primera carga con prioridad.
