@@ -137,7 +137,7 @@
 
 .slab {
   position: relative;
-  aspect-ratio: 1 / 1.08;
+  aspect-ratio: 1 / 1.14;
   background: var(--slab) center / 100% 100% no-repeat;
   filter: drop-shadow(0 14px 14px rgb(2 6 40 / 0.55)) drop-shadow(0 2px 3px rgb(2 6 40 / 0.45));
 }
@@ -148,7 +148,7 @@
   left: 9.5%;
   right: 9.5%;
   top: 10.5%;
-  bottom: 33%;
+  bottom: 35.5%;
   overflow: hidden;
   border-radius: 4px;
   background: #e9e4dc;
@@ -176,8 +176,8 @@
   position: absolute;
   left: 6.5%;
   right: 6%;
-  bottom: 4.5%;
-  height: 24.5%;
+  bottom: 4%;
+  height: 28%;
   display: flex;
   align-items: center;
   gap: 4.5cqw;
@@ -214,6 +214,10 @@
 }
 
 .title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   font-size: clamp(1.2rem, 6.4cqw, 1.6rem);
   font-weight: 700;
   line-height: 1.12;
