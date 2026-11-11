@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { preload } from "react-dom";
 import type { PublicStore } from "@/lib/store";
 import type { Piece } from "@/lib/types";
 import { formatPrice } from "@/lib/bot/parse";
 import s from "./store-view.module.css";
 
 const GLAZES = ["celadon", "ironred", "shino", "ash"] as const;
+const glazeOf = (n: number) => GLAZES[n % GLAZES.length];
 
 // Cada tablilla cuelga un poquito torcida de su clavo, siempre igual para la misma pieza.
 const tilt = (n: number) => (((n * 37) % 11) - 5) * 0.16;
@@ -16,6 +18,10 @@ const updatedLabel = (iso: string) =>
 
 export function StoreView({ store, compact = false }: { store: PublicStore; compact?: boolean }) {
   const { pieces } = store;
+  // Fondos que vienen por CSS: se avisan temprano para que no demoren la primera pantalla.
+  preload("/plates/glaze-cobalt.webp", { as: "image", fetchPriority: "high" });
+  preload("/plates/logo.webp", { as: "image", fetchPriority: "high" });
+  for (const p of pieces.slice(0, 2)) preload(`/plates/tile-${glazeOf(p.number)}.webp`, { as: "image", fetchPriority: "high" });
   return (
     <div className={s.wall} data-compact={compact || undefined}>
       <header className={s.intro}>
@@ -100,7 +106,7 @@ function Contact({ phone, again = false }: { phone: string; again?: boolean }) {
 }
 
 function Tile({ piece, priority }: { piece: Piece; priority: boolean }) {
-  const glaze = GLAZES[piece.number % GLAZES.length];
+  const glaze = glazeOf(piece.number);
   return (
     <li className={s.tile} style={{ "--tilt": `${tilt(piece.number)}deg`, "--slab": `url(/plates/tile-${glaze}.webp)` } as CSSProperties}>
       <article className={s.slab} aria-label={`Pieza número ${piece.number}: ${piece.title}, ${formatPrice(piece.price)}`}>
