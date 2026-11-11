@@ -94,6 +94,6 @@ export async function tileImage(piece: Piece, base: string, opts: { sold?: boole
         </div>
       </div>
     ),
-    { width: W, height: H, fonts: await fontData, headers: { "cache-control": "public, max-age=31536000, immutable" } },
+    { width: W, height: H, fonts: await fontData, headers: { "cache-control": "public, max-age=31536000, s-maxage=31536000, immutable" } },
   );
 }
