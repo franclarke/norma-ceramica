@@ -3,22 +3,26 @@
     {
       "name": "tile-celadon",
       "width": 1152,
-      "height": 1105
+      "height": 1105,
+      "glazeEnds": 0.775
     },
     {
       "name": "tile-ironred",
       "width": 1136,
-      "height": 1129
+      "height": 1129,
+      "glazeEnds": 0.775
     },
     {
       "name": "tile-shino",
       "width": 1189,
-      "height": 1139
+      "height": 1139,
+      "glazeEnds": 0.805
     },
     {
       "name": "tile-ash",
       "width": 1185,
-      "height": 1154
+      "height": 1154,
+      "glazeEnds": 0.805
     }
   ],
   "glazeDominant": {

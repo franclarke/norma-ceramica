@@ -11,6 +11,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "..", "public", "plates");
 mkdirSync(OUT, { recursive: true });
 
+const GLAZE_ENDS = { "tile-celadon": 0.775, "tile-ironred": 0.775, "tile-shino": 0.805, "tile-ash": 0.805 };
+
 async function tile(name) {
   const { data, info } = await sharp(join(ROOT, "raw", `${name}.png`)).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
@@ -45,8 +47,19 @@ async function tile(name) {
   const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
   const img = sharp(rgba, { raw: { width: w, height: h, channels: 4 } }).extract({ left: x0, top: y0, width: cw, height: ch });
   const buf = await img.png().toBuffer();
-  await sharp(buf).resize({ width: 900 }).webp({ quality: 82, alphaQuality: 90 }).toFile(join(OUT, `${name}.webp`));
-  return { name, width: cw, height: ch };
+
+  // Dónde termina el esmalte en cada tablilla (medido a ojo sobre la imagen, incluye la línea ondulada).
+  // Se recompone cada una con la franja de barro siempre en la misma proporción, así el texto nunca pisa el esmalte.
+  const { info: pi } = await sharp(buf).toBuffer({ resolveWithObject: true });
+  const boundary = Math.round(pi.height * GLAZE_ENDS[name]);
+  const W = 900, H = Math.round(W * 1.14), STRIP = Math.round(H * 0.3);
+  const top = await sharp(buf).extract({ left: 0, top: 0, width: pi.width, height: boundary }).resize(W, H - STRIP, { fit: "fill" }).png().toBuffer();
+  const bottom = await sharp(buf).extract({ left: 0, top: boundary, width: pi.width, height: pi.height - boundary }).resize(W, STRIP, { fit: "fill" }).png().toBuffer();
+  await sharp({ create: { width: W, height: H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: top, left: 0, top: 0 }, { input: bottom, left: 0, top: H - STRIP }])
+    .webp({ quality: 82, alphaQuality: 90 })
+    .toFile(join(OUT, `${name}.webp`));
+  return { name, width: cw, height: ch, glazeEnds: +(boundary / pi.height).toFixed(3) };
 }
 
 async function glaze() {
