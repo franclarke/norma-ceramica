@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T09:32:30.080Z",
+  "title": "Design System: Norma · cerámica",
+  "extensions": {
+    "colorMeta": {
+      "cobalt": {
+        "role": "primary",
+        "displayName": "Esmalte Cobalto",
+        "canonical": "#0b1a6e",
+        "tonalRamp": [
+          "#03071c",
+          "#060d37",
+          "#081453",
+          "#0b1a6e",
+          "#3c488b",
+          "#6d76a8",
+          "#9da3c5",
+          "#ced1e2"
+        ]
+      },
+      "cobalt-deep": {
+        "role": "primary",
+        "displayName": "Cobalto de Horno",
+        "canonical": "#071150",
+        "tonalRamp": [
+          "#020414",
+          "#040928",
+          "#050d3c",
+          "#071150",
+          "#394173",
+          "#6a7096",
+          "#9ca0b9",
+          "#cdcfdc"
+        ]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "Ámbar de Foco",
+        "canonical": "#ffd36e",
+        "tonalRamp": [
+          "#40351c",
+          "#806a37",
+          "#bf9e53",
+          "#ffd36e",
+          "#ffdc8b",
+          "#ffe5a8",
+          "#ffedc5",
+          "#fff6e2"
+        ]
+      },
+      "amber-ink": {
+        "role": "secondary",
+        "displayName": "Tinta Ámbar",
+        "canonical": "#1b1200"
+      },
+      "glaze-white": {
+        "role": "neutral",
+        "displayName": "Blanco Esmalte",
+        "canonical": "#ffffff"
+      },
+      "glaze-soft": {
+        "role": "neutral",
+        "displayName": "Esmalte Lavado",
+        "canonical": "#dfe5ff",
+        "tonalRamp": [
+          "#383940",
+          "#707380",
+          "#a7acbf",
+          "#dfe5ff",
+          "#e5eaff",
+          "#ecefff",
+          "#f2f5ff",
+          "#f9faff"
+        ]
+      },
+      "glaze-line": {
+        "role": "neutral",
+        "displayName": "Línea de Esmalte",
+        "canonical": "rgb(223 229 255 / 0.28)"
+      },
+      "bisque": {
+        "role": "neutral",
+        "displayName": "Bizcocho",
+        "canonical": "#d9bd93",
+        "note": "Referencia del barro raster de las losas; no se pinta por CSS.",
+        "tonalRamp": [
+          "#362f25",
+          "#6d5f4a",
+          "#a38e6e",
+          "#d9bd93",
+          "#e1caa9",
+          "#e8d7be",
+          "#f0e5d4",
+          "#f7f2e9"
+        ]
+      },
+      "clay-ink": {
+        "role": "neutral",
+        "displayName": "Tinta de Barro",
+        "canonical": "#2b1a0e",
+        "tonalRamp": [
+          "#0b0704",
+          "#160d07",
+          "#20140b",
+          "#2b1a0e",
+          "#55483e",
+          "#80766e",
+          "#aaa39f",
+          "#d5d1cf"
+        ]
+      },
+      "clay-groove": {
+        "role": "neutral",
+        "displayName": "Surco",
+        "canonical": "#4a2c17",
+        "tonalRamp": [
+          "#130b06",
+          "#25160c",
+          "#382111",
+          "#4a2c17",
+          "#6e5645",
+          "#928074",
+          "#b7aba2",
+          "#dbd5d1"
+        ]
+      }
+    },
+    "sanctionedExceptions": {
+      "whatsapp": {
+        "purpose": "Chat del /simulador con los colores reales de WhatsApp para que se reconozca. No es paleta de marca; sólo dentro del marco del celular.",
+        "colors": {
+          "header": "#008069",
+          "thread": "#efeae2",
+          "bubbleIn": "#ffffff",
+          "bubbleOut": "#d9fdd3",
+          "text": "#111b21",
+          "meta": "#667781",
+          "readTicks": "#53bdeb",
+          "system": "#fff6c5",
+          "composer": "#f0f2f5",
+          "chipBorder": "#d1d7db"
+        }
+      }
+    },
+    "contrast": [
+      {
+        "pair": "glaze-white / cobalt",
+        "ratio": 15.1
+      },
+      {
+        "pair": "glaze-soft / cobalt",
+        "ratio": 12.1
+      },
+      {
+        "pair": "amber / cobalt",
+        "ratio": 10.7
+      },
+      {
+        "pair": "amber-ink / amber",
+        "ratio": 13.1
+      },
+      {
+        "pair": "cobalt-deep / glaze-white",
+        "ratio": 17.4
+      },
+      {
+        "pair": "clay-ink / bisque",
+        "ratio": 9.3
+      },
+      {
+        "pair": "clay-groove / bisque",
+        "ratio": 7
+      }
+    ],
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Título del simulador; 1.75rem en celular."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "¿Te gustó alguna?, teléfono, título de la lista."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Saludo de Norma."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido y tabla; 20–22px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pestañas y leyendas."
+      },
+      "tile-number": {
+        "displayName": "Número grabado",
+        "purpose": "Número de pieza en la franja de barro."
+      },
+      "tile-price": {
+        "displayName": "Precio",
+        "purpose": "Precio en la tablilla."
+      },
+      "tile-title": {
+        "displayName": "Nombre",
+        "purpose": "Nombre de la pieza, máximo 2 líneas."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tile-hung",
+        "value": "drop-shadow(0 14px 14px rgb(2 6 40 / 0.55)) drop-shadow(0 2px 3px rgb(2 6 40 / 0.45))",
+        "purpose": "filter: la tablilla colgada delante de la pared, sigue su silueta."
+      },
+      {
+        "name": "window-sunk",
+        "value": "inset 0 3px 8px rgb(20 10 0 / 0.45), inset 0 -1px 2px rgb(255 255 255 / 0.25)",
+        "purpose": "La foto embutida en el esmalte (más 0 0 0 2px rgb(255 255 255 / 0.18))."
+      },
+      {
+        "name": "engraved",
+        "value": "0 1.5px 0 rgb(255 240 215 / 0.6), 0 -1px 1px rgb(40 20 5 / 0.45)",
+        "purpose": "text-shadow: número hundido en el barro."
+      },
+      {
+        "name": "device",
+        "value": "0 30px 50px -20px rgb(0 0 20 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.08)",
+        "purpose": "Celulares del simulador."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 3px solid #ffd36e; outline-offset: 4px; border-radius: 6px",
+        "purpose": "Foco visible global."
+      }
+    ],
+    "motion": [
+      {
+        "name": "swing",
+        "value": "1.8s cubic-bezier(0.22, 1, 0.36, 1); rotate tilt, +3.2deg, -2.2deg, +1.3deg, -0.7deg, +0.3deg, tilt @ 0/14/32/50/68/84/100%",
+        "purpose": "La tablilla se hamaca sobre su clavo: :hover con (hover: hover), :active y :focus-within."
+      },
+      {
+        "name": "flash",
+        "value": "2.4s cubic-bezier(0.16, 1, 0.3, 1); scale 0.6 -> 1.08 -> 1",
+        "purpose": "Aviso ámbar de que la página cambió."
+      },
+      {
+        "name": "pop",
+        "value": "0.32s cubic-bezier(0.16, 1, 0.3, 1); translateY(6px) scale(0.98) -> 0",
+        "purpose": "Entrada de mensajes del chat."
+      },
+      {
+        "name": "rise",
+        "value": "0.35s cubic-bezier(0.16, 1, 0.3, 1); translateY(100%) -> 0",
+        "purpose": "Hojas que suben en el chat."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition: none (todo elemento)",
+        "purpose": "Con prefers-reduced-motion: reduce no se mueve nada; las tablillas quedan en su inclinación fija."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "two-up",
+        "value": "640px"
+      },
+      {
+        "name": "wall",
+        "value": "1024px"
+      },
+      {
+        "name": "three-up",
+        "value": "1360px"
+      }
+    ],
+    "plates": {
+      "ground": "/plates/glaze-cobalt.webp (720px, espejada 2x2, repite)",
+      "slabs": "/plates/tile-{celadon,ironred,shino,ash}.webp, 720x821 (1/1.14), barro en el 30% inferior",
+      "masks": "/plates/logo.webp (1024/365), /plates/stroke.webp; pintadas con currentColor",
+      "pipeline": "assets/scripts/plates.mjs"
+    }
+  },
+  "components": [
+    {
+      "name": "Tablilla de prueba",
+      "kind": "custom",
+      "refersTo": "tile-label",
+      "description": "La pieza: losa esmaltada colgada de un clavo, foto embutida, número grabado y precio en la franja de barro.",
+      "html": "<div class=\"ds-tile\"><div class=\"ds-slab\"><div class=\"ds-window\"></div><div class=\"ds-label\"><span class=\"ds-num\">12</span><span class=\"ds-groove\"></span><span class=\"ds-text\"><span class=\"ds-name\">Cuenco celadón</span><span class=\"ds-price\">$18.000</span></span></div></div></div>",
+      "css": ".ds-tile{--tilt:-0.5deg;width:280px;rotate:var(--tilt);transform-origin:50% 1.5%;container-type:inline-size;font-family:var(--font)}.ds-tile:hover,.ds-tile:active{animation:ds-swing 1.8s cubic-bezier(0.22,1,0.36,1)}@keyframes ds-swing{0%{rotate:var(--tilt)}14%{rotate:calc(var(--tilt) + 3.2deg)}32%{rotate:calc(var(--tilt) - 2.2deg)}50%{rotate:calc(var(--tilt) + 1.3deg)}68%{rotate:calc(var(--tilt) - 0.7deg)}84%{rotate:calc(var(--tilt) + 0.3deg)}100%{rotate:var(--tilt)}}.ds-slab{position:relative;aspect-ratio:1/1.14;background:url(/plates/tile-celadon.webp) center/100% 100% no-repeat,linear-gradient(#8fb3a3 0 70%,#d9bd93 70%);filter:drop-shadow(0 14px 14px rgb(2 6 40 / .55)) drop-shadow(0 2px 3px rgb(2 6 40 / .45))}.ds-window{position:absolute;left:9.5%;right:9.5%;top:10.5%;bottom:34.5%;border-radius:4px;background:#e9e4dc;box-shadow:0 0 0 2px rgb(255 255 255 / .18),inset 0 3px 8px rgb(20 10 0 / .45)}.ds-label{position:absolute;left:6.5%;right:6%;bottom:4.5%;height:25.5%;display:flex;align-items:flex-end;gap:4.5cqw;color:var(--clay-ink,#2b1a0e)}.ds-num{font-size:clamp(2.4rem,13.5cqw,4.2rem);font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--clay-groove,#4a2c17);text-shadow:0 1.5px 0 rgb(255 240 215 / .6),0 -1px 1px rgb(40 20 5 / .45)}.ds-groove{align-self:stretch;margin:6% 0 2%;width:3px;border-radius:2px;background:rgb(74 44 23 / .45);box-shadow:1px 0 0 rgb(255 240 215 / .55)}.ds-text{display:grid;gap:.15em}.ds-name{font-size:clamp(1.12rem,6.2cqw,1.6rem);font-weight:700;line-height:1.06}.ds-price{font-size:clamp(1.4rem,7.8cqw,2rem);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}@media (prefers-reduced-motion:reduce){.ds-tile{animation:none!important}}"
+    },
+    {
+      "name": "Teléfono con trazo de pincel",
+      "kind": "custom",
+      "refersTo": "phone-number",
+      "description": "El dato para pedir: número grande con un trazo de pincel blanco debajo.",
+      "html": "<p class=\"ds-contact\"><strong class=\"ds-ask\">¿Te gustó alguna?</strong>Escribime al <span class=\"ds-phone\">11 5555-0000<span class=\"ds-stroke\"></span></span> y contame cuál.</p>",
+      "css": ".ds-contact{display:grid;gap:4px;padding:20px;border-top:2px solid var(--glaze-line,rgb(223 229 255 / .28));background:var(--cobalt,#0b1a6e);color:var(--glaze-soft,#dfe5ff);font-family:var(--font);font-size:clamp(1.25rem,1.15rem + .4vw,1.4rem);line-height:1.55;margin:0}.ds-ask{color:#fff;font-size:clamp(1.5rem,1.3rem + .8vw,1.85rem);font-weight:800;line-height:1.2}.ds-phone{position:relative;display:inline-block;font-size:clamp(1.5rem,1.3rem + .8vw,1.85rem);font-weight:800;color:#fff;white-space:nowrap;letter-spacing:.01em;padding-bottom:6px;font-variant-numeric:tabular-nums}.ds-stroke{position:absolute;left:-4%;right:-6%;bottom:-6px;height:14px;background:#fff;opacity:.92;-webkit-mask:url(/plates/stroke.webp) center/100% 100% no-repeat;mask:url(/plates/stroke.webp) center/100% 100% no-repeat}"
+    },
+    {
+      "name": "Lista en texto llano",
+      "kind": "card",
+      "refersTo": "body",
+      "description": "El dorso: todas las piezas como tabla, número, nombre y precio.",
+      "html": "<table class=\"ds-list\"><thead><tr><th>Nº</th><th>Pieza</th><th>Precio</th></tr></thead><tbody><tr><td>12</td><td>Cuenco celadón</td><td>$18.000</td></tr><tr><td>13</td><td>Taza rojo hierro</td><td>$9.500</td></tr></tbody></table>",
+      "css": ".ds-list{width:100%;max-width:40rem;border-collapse:collapse;background:var(--cobalt,#0b1a6e);color:#fff;font-family:var(--font);font-size:clamp(1.25rem,1.15rem + .4vw,1.4rem);font-variant-numeric:tabular-nums}.ds-list th{text-align:left;font-size:1rem;font-weight:700;color:var(--glaze-soft,#dfe5ff);padding:0 0 8px;border-bottom:2px solid var(--glaze-line,rgb(223 229 255 / .28))}.ds-list td{padding:10px 0;border-bottom:1px solid var(--glaze-line,rgb(223 229 255 / .28))}.ds-list td:first-child,.ds-list th:first-child{width:3.2ch;font-weight:800}.ds-list td:last-child,.ds-list th:last-child{text-align:right;font-weight:700;padding-left:12px}"
+    },
+    {
+      "name": "Pestañas del simulador",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Chat / página en celular; la seleccionada se llena de blanco, un punto ámbar avisa el cambio.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">El chat</button><button role=\"tab\" aria-selected=\"false\">La página<span class=\"ds-dot\"></span></button></div>",
+      "css": ".ds-tabs{display:inline-flex;gap:6px;padding:5px;border-radius:999px;background:rgb(4 10 50 / .55);box-shadow:inset 0 0 0 1px var(--glaze-line,rgb(223 229 255 / .28))}.ds-tabs button{font-family:var(--font);font-size:1.05rem;font-weight:700;color:var(--glaze-soft,#dfe5ff);background:transparent;border:0;border-radius:999px;padding:10px 18px;min-height:48px;cursor:pointer}.ds-tabs button[aria-selected=true]{background:#fff;color:var(--cobalt-deep,#071150)}.ds-tabs button:focus-visible{outline:3px solid #ffd36e;outline-offset:4px}.ds-dot{display:inline-block;width:10px;height:10px;margin-left:6px;border-radius:50%;background:#ffd36e;vertical-align:2px}"
+    },
+    {
+      "name": "Logo a pincel",
+      "kind": "custom",
+      "refersTo": "glaze-white",
+      "description": "Máscara raster pintada con currentColor; el nombre real va en sr-only.",
+      "html": "<h1 class=\"ds-logo\"><span class=\"ds-logo-mark\" aria-hidden=\"true\"></span></h1>",
+      "css": ".ds-logo{margin:0;line-height:0;background:var(--cobalt,#0b1a6e);padding:16px}.ds-logo-mark{display:block;width:300px;aspect-ratio:1024/365;background:#fff;-webkit-mask:url(/plates/logo.webp) center/contain no-repeat;mask:url(/plates/logo.webp) center/contain no-repeat}"
+    },
+    {
+      "name": "Burbuja de WhatsApp (excepción)",
+      "kind": "custom",
+      "refersTo": "sanctionedExceptions.whatsapp",
+      "description": "Sólo dentro del chat del simulador: colores reales de WhatsApp, no de marca.",
+      "html": "<div class=\"ds-thread\"><p class=\"ds-bubble ds-in\">¿Le cambio el precio a la 12?</p><p class=\"ds-bubble ds-out\">Sí, ponela a 20 mil</p></div>",
+      "css": ".ds-thread{display:flex;flex-direction:column;gap:6px;padding:14px 10px;background:#efeae2;color:#111b21;font-family:var(--font);width:320px}.ds-bubble{margin:0;max-width:82%;border-radius:8px;padding:6px 8px;font-size:1.05rem;line-height:1.38;box-shadow:0 1px .5px rgb(11 20 26 / .13)}.ds-in{align-self:flex-start;background:#fff;border-top-left-radius:0}.ds-out{align-self:flex-end;background:#d9fdd3;border-top-right-radius:0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La pared del taller",
+    "overview": "La página es la pared de esmalte cobalto del taller de Norma, y cada pieza es una tablilla de prueba de gres colgada de un clavo: arriba el esmalte (celadón, rojo hierro, shino o ceniza) con la foto embutida como una ventanita, abajo la franja de barro crudo donde el número está grabado, hundido, al lado del nombre y el precio. Los materiales son raster reales (`public/plates/`), no dibujos de vector: el cobalto es una textura que repite, las tablillas son losas fotográficas, y el logo y el trazo de pincel son máscaras que se pintan con el color del tema.\n\nEstá pensada para compradores de unos 70 años en el celular. Por eso todo es grande, en una sola familia tipográfica hiperlegible, con contraste alto y números enormes; la decoración nunca le compite a la lectura. Rechaza la grilla de tienda (card blanca, foto, título, botón) y el crema-serif-terracota genérico.",
+    "keyCharacteristics": [
+      "Fondo de esmalte cobalto texturado, texto blanco y blanco-esmalte.",
+      "Tablillas levemente torcidas sobre su clavo que se hamacan al tocarlas.",
+      "Número grabado en barro crudo como dato principal de cada pieza.",
+      "Una sola tipografía (Atkinson Hyperlegible Next) en 400, 700 y 800.",
+      "Un dorso en texto llano: la misma lista como tabla, por si es más fácil."
+    ],
+    "rules": [
+      {
+        "name": "The Un Solo Acento Rule",
+        "body": "El ámbar significa \"acá estás\" o \"esto cambió\": foco, selección, aviso. Si no es estado, no es ámbar.",
+        "section": "colors"
+      },
+      {
+        "name": "The Esmalte Real Rule",
+        "body": "El cobalto, las tablillas y el barro vienen de las plates raster. No se reemplazan por degradés ni por colores planos que imiten el material.",
+        "section": "colors"
+      },
+      {
+        "name": "The Números Enormes Rule",
+        "body": "El número y el precio de cada pieza son siempre más grandes que su nombre, y siempre en cifras tabulares.",
+        "section": "typography"
+      },
+      {
+        "name": "The Piso de 1rem Rule",
+        "body": "En el mundo de Norma nada baja de 1rem (16px), y el cuerpo nunca de 1.25rem (20px).",
+        "section": "typography"
+      },
+      {
+        "name": "The Luz de Arriba Rule",
+        "body": "Toda sombra cae hacia abajo y todo grabado tiene su brillo debajo: una sola luz, cenital, en toda la pared.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do mantener el texto principal en glaze-white (15.1:1) y el secundario en glaze-soft (12.1:1) sobre cobalto; sobre barro, clay-ink (9.3:1) y clay-groove (7.0:1). Mínimo AA 4.5:1 para cualquier texto nuevo, apuntando a 7:1.",
+      "Do usar `--step-0` (20–22px) para el cuerpo y nunca menos de 1rem para texto del mundo de Norma.",
+      "Do dar a todo control al menos 48px de alto y foco visible ámbar (3px, offset 4px).",
+      "Do que toda acción y todo dato funcione sin hover: el hover sólo agrega el balanceo, que también responde al toque.",
+      "Do cortar todo movimiento con `prefers-reduced-motion: reduce` (animaciones y transiciones en `none`); las tablillas quedan quietas en su inclinación.",
+      "Do producir plates nuevas con `assets/scripts/plates.mjs`: losas de 720 × 821 con la franja de barro en el 30% inferior, cobalto espejado 2×2 para repetir sin costura.",
+      "Do escribir en castellano rioplatense, con la voz de Norma."
+    ],
+    "donts": [
+      "Don't volver a la grilla de tienda: card blanca, foto, título, botón.",
+      "Don't usar crema, serif y terracota como identidad.",
+      "Don't usar una segunda tipografía ni un peso menor a 400.",
+      "Don't usar los verdes y beiges de WhatsApp fuera del marco del chat del simulador.",
+      "Don't poner el número o el precio de una pieza como imagen: siempre texto real.",
+      "Don't marcar estado sólo con color: también con forma (punto, píldora, pestaña llena)."
+    ]
+  }
+}

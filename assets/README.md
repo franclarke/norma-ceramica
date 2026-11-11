@@ -1,19 +1,31 @@
-# Assets: dirección de arte
+# Assets: de dónde sale cada imagen
 
-Todo tiene que parecer hecho por Norma: una profesora de plástica jubilada de 70 años que hace cerámica.
-Mano experta y suelta, trabaja rápido y no se preocupa por la perfección.
+## El mundo final: la pared de tablillas
 
-## Reglas
+La página es la pared del taller de Norma. Cada pieza cuelga en una **tablilla de prueba de esmalte**, como las que hacen los ceramistas para probar esmaltes, con el número en la franja de barro crudo.
 
-- **Un solo material:** tinta china con pincel redondo gastado. Trazos con presión variable, pincel seco donde se acaba la tinta, bordes irregulares y formas que no cierran del todo.
-- **Dos tintas:** negro tinta (trazos, logo, dibujos) y terracota (los sellos con el número de cada pieza).
-- **Fondo blanco plano** en los originales, para sacar la tinta limpia. La textura de papel va aparte.
-- **La decoración nunca tapa ni compite con la lectura.** El número de cada pieza es texto real (Atkinson Hyperlegible) dentro de un sello dibujado, nunca una imagen.
-- **Si algo se nota "de IA"** (simetría perfecta, curvas de vector, letras que parecen tipografía), se descarta y se dibuja a mano.
+| Archivo en `public/plates/` | Origen | Proceso |
+|---|---|---|
+| `glaze-cobalt.webp` | `raw/glaze-cobalt-v2.png` (Codex, prompt `prompts/glaze-cobalt-v2.md`) | Se comprime el rango tonal para que el texto blanco quede siempre por encima de 7:1, y se espeja 2×2 para que repita sin costuras. |
+| `tile-{celadon,ironred,shino,ash}.webp` | `raw/tile-*.png` (Codex, `prompts/tile-*.md`) | Fondo negro a transparente con relleno desde los bordes. Se recompone cada tablilla para que el barro sea siempre el 30% inferior y el texto nunca pise el esmalte. |
+| `logo.webp`, `stroke.webp` | `raw/logo-v2.png` y `raw/strokes.png` (Codex, pincel y tinta) | Blanco a transparente (`scripts/extract.mjs`). Se usan como `mask-image` y toman el color del tema. Al logo se le sacó la jarrita porque se leía como un "3". |
 
-## Proceso
+`node scripts/plates.mjs` regenera todo `public/plates/`.
 
-1. `prompts/*.md`: un prompt por hoja, generado con Codex CLI (`image_generation`).
-2. `raw/`: las hojas tal como salen, sin tocar.
-3. `node scripts/extract.mjs`: pasa el blanco a transparencia (algoritmo *color to alpha*) y recorta cada dibujo suelto.
-4. `out/`: PNG/WebP transparentes listos para usar como `mask-image`, así se pintan con los colores del tema por CSS.
+## Fotos de las piezas
+
+Las fotos son reales, de Unsplash y Pexels, con su licencia verificada en [`photos/CREDITS.md`](photos/CREDITS.md). No hay fotos generadas con IA. Nombres y precios son de ejemplo.
+
+## Exploración (no se usa en la página)
+
+- `prompts/{logo,doodles,strokes,stamps,tape,paper}.md`: la primera exploración, en tinta china sobre papel crema. Se descartó por caer en el look crema de las IAs.
+- `prompts/tile-*-wide.md`: tablillas apaisadas para mobile, descartadas porque achicaban la foto de la pieza.
+- `lamina.html`: lámina de revisión de esa primera exploración (`node scripts/serve.mjs`).
+- Las composiciones de dirección (lámina escolar, sobre de molde, tablillas) están en `.impeccable/mocks/`.
+
+## Herramientas
+
+- `scripts/gen.sh <prompt> [ink]`: genera una hoja con Codex CLI.
+- `scripts/comp.sh <prompt.md> <salida.png> [referencias…]`: genera una composición de página.
+- `scripts/extract.mjs`: recorta y pasa a transparente las hojas de tinta.
+- `scripts/plates.mjs`: produce las plates finales.

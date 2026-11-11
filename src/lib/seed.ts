@@ -5,16 +5,16 @@ import type { Piece, Store } from "./types";
 const SEED: [number, string, number, string, number, number][] = [
   [24, "Plato pintado con pájaro", 18000, "06", 1000, 667],
   [23, "Tetera con su cuenquito", 21000, "07", 750, 1000],
-  [21, "Taza verde agua", 8500, "02", 1000, 667],
+  [21, "Taza verde salvia", 8500, "02-b", 1000, 750],
   [19, "Tinaja con tapa", 14000, "12", 750, 1000],
-  [18, "Fuente gris honda", 15000, "03", 665, 1000],
-  [16, "Taza crema", 8000, "10", 667, 1000],
+  [18, "Ensaladera blanca", 15000, "03-b", 1000, 750],
+  [16, "Taza moteada", 8000, "10-b", 1000, 750],
   [14, "Jarrita blanca", 9500, "01", 800, 965],
   [11, "Par de tazas blancas", 10000, "08", 667, 1000],
   [9, "Botella blanca y negra", 11000, "04", 1000, 667],
   [7, "Centro de mesa verde", 13000, "05", 1000, 667],
-  [5, "Maceta de barro", 5500, "09", 667, 1000],
-  [3, "Botellita para flores secas", 6500, "11", 665, 1000],
+  [5, "Maceta de barro rústica", 5500, "09-b", 1000, 924],
+  [3, "Florerito azul", 6500, "11-b", 1000, 750],
 ];
 
 export function seedPieces(now = "2026-11-10T12:00:00.000Z"): Piece[] {

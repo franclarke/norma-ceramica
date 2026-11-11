@@ -5,11 +5,11 @@
   --cobalt: #0e2189;
   --cobalt-deep: #091862;
   --glaze-white: #ffffff;
-  --glaze-soft: #dfe5ff; /* texto secundario sobre cobalto, 12:1 */
+  --glaze-soft: #dfe5ff; /* texto secundario sobre cobalto, 6:1 en el punto más claro del esmalte */
   --glaze-line: rgb(223 229 255 / 0.28);
   --bisque: #d9bd93;
   --clay-ink: #2b1a0e; /* texto sobre barro crudo, 10:1 */
-  --clay-groove: #4a2c17; /* números grabados */
+  --clay-groove: #4a2c17; /* números de pieza, tinta de sello */
   --amber: #ffd36e; /* foco y selección */
   --font: var(--font-atkinson), "Atkinson Hyperlegible Next", system-ui, sans-serif;
 

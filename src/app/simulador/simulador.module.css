@@ -129,7 +129,7 @@
 }
 
 .flash {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #1b1200;
   background: var(--amber);
@@ -228,7 +228,7 @@
 }
 
 .waName small {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 400;
   opacity: 0.9;
 }
@@ -238,14 +238,14 @@
   align-items: center;
   gap: 6px;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
-  background: rgb(255 255 255 / 0.14);
+  background: rgb(255 255 255 / 0.16);
   border: 0;
   border-radius: 999px;
-  padding: 8px 12px;
-  min-height: 40px;
+  padding: 8px 14px;
+  min-height: 44px;
   cursor: pointer;
 }
 
@@ -340,8 +340,8 @@
   justify-content: flex-end;
   align-items: center;
   gap: 3px;
-  font-size: 0.72rem;
-  color: #667781;
+  font-size: 0.8rem;
+  color: #54656f;
   margin-top: 2px;
 }
 
@@ -416,13 +416,13 @@
 .tries button {
   flex: none;
   font: inherit;
-  font-size: 0.92rem;
+  font-size: 1rem;
   color: #111b21;
   background: #fff;
-  border: 1px solid #d1d7db;
+  border: 1px solid #b8c1c6;
   border-radius: 999px;
-  padding: 6px 12px;
-  min-height: 36px;
+  padding: 8px 14px;
+  min-height: 44px;
   cursor: pointer;
 }
 
