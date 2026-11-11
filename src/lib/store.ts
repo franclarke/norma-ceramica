@@ -21,15 +21,31 @@ export async function saveStore(store: Store): Promise<void> {
   await getStorage().writeJSON(key(store.id), store);
 }
 
-/** Lo que ve el comprador: cacheado y con tag, se invalida cuando Norma cambia algo. */
+const toPublic = (s: Store) => ({
+  id: s.id,
+  ownerName: s.ownerName,
+  contactPhone: s.contactPhone,
+  pieces: s.pieces,
+  updatedAt: s.updatedAt,
+  demo: Boolean(s.demo),
+});
+
+/**
+ * Lo que ve el comprador en la página de Norma. Caché remota (compartida entre todas
+ * las instancias de Vercel) con tag: cuando Norma cambia algo se invalida al toque.
+ */
 export async function getPublicStore(id: string) {
-  "use cache";
+  "use cache: remote";
   cacheTag(storeTag(id));
   cacheLife("days");
-  const s = await loadStore(id);
-  return { id: s.id, ownerName: s.ownerName, contactPhone: s.contactPhone, pieces: s.pieces, updatedAt: s.updatedAt, demo: Boolean(s.demo) };
+  return toPublic(await loadStore(id));
 }
 
-export type PublicStore = Awaited<ReturnType<typeof getPublicStore>>;
+/** Tiendas de prueba del simulador: siempre frescas, cambian a cada mensaje. */
+export async function getFreshPublicStore(id: string) {
+  return toPublic(await loadStore(id));
+}
+
+export type PublicStore = ReturnType<typeof toPublic>;
 
 export const isDemoId = (id: string) => /^demo-[a-z0-9]{6,16}$/.test(id);

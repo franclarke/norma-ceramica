@@ -17,7 +17,8 @@ export function isOwner(waId: string) {
 
 export function verifySignature(rawBody: string, header: string | null) {
   const secret = process.env.WHATSAPP_APP_SECRET;
-  if (!secret) return true; // sin secreto configurado no se puede verificar (solo desarrollo)
+  // Sin secreto solo se acepta si WhatsApp no está conectado (desarrollo); en ese caso nadie es dueño.
+  if (!secret) return !whatsappConfigured();
   if (!header?.startsWith("sha256=")) return false;
   const expected = Buffer.from(createHmac("sha256", secret).update(rawBody).digest("hex"));
   const got = Buffer.from(header.slice(7));
