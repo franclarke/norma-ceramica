@@ -589,3 +589,44 @@
 .sheet .composer {
   margin: 0 -14px;
 }
+
+/* ---------- Celular: el simulador ocupa la pantalla ---------- */
+@media (max-width: 639px) {
+  .page {
+    padding-top: 18px;
+    padding-inline: 12px;
+  }
+  .head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .home {
+    width: 120px;
+  }
+  .title {
+    font-size: 1.75rem;
+  }
+  .lede {
+    font-size: 1.1rem;
+  }
+  .caption {
+    display: none;
+  }
+  .phone {
+    width: 100%;
+    height: calc(100dvh - 90px);
+    min-height: 520px;
+    border-width: 0;
+    border-radius: 18px;
+  }
+  .waHeader {
+    border-radius: 18px 18px 0 0;
+  }
+  .frame {
+    border-radius: 18px;
+  }
+  .reset span {
+    display: none;
+  }
+}
