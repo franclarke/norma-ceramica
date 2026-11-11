@@ -5,7 +5,12 @@ import type { ConversationStep, Draft, IncomingMessage, OutgoingMessage, Piece, 
 import { cleanTitle, detectIntent, formatPrice, normalize, parsePieceNumber, parsePrice, splitTitleAndPrice } from "./parse";
 
 export type Context = { now: string; siteUrl: string };
-export type Result = { store: Store; replies: OutgoingMessage[] };
+export type Result = {
+  store: Store;
+  replies: OutgoingMessage[];
+  /** Pieza publicada o cambiada en este turno (para mandarle a Norma cómo quedó). */
+  touched?: number;
+};
 
 const B = {
   add: { id: "menu:add", title: "Agregar una pieza" },
@@ -22,6 +27,7 @@ const B = {
   fixTitle: { id: "fix:title", title: "El nombre" },
   fixPrice: { id: "fix:price", title: "El precio" },
   retry: { id: "photo:retry", title: "Mando otra" },
+  acceptTitle: { id: "title:accept", title: "Sí, ponele ese" },
   keep: { id: "photo:keep", title: "Usar esta" },
 } satisfies Record<string, ReplyButton>;
 
@@ -76,6 +82,7 @@ export function respond(store: Store, msg: IncomingMessage, ctx: Context): Resul
       photo: msg.photo,
       title: fromCaption.title ?? prev.title,
       price: fromCaption.price ?? prev.price,
+      suggestedTitle: msg.suggestedTitle ?? prev.suggestedTitle,
     };
     if (msg.dark) {
       set({ step: "add:dark-photo", draft });
@@ -107,6 +114,9 @@ export function respond(store: Store, msg: IncomingMessage, ctx: Context): Resul
       return { store: s, replies: out };
     }
     case "add:title": {
+      if ((answer === "title:accept" || yes) && step.draft.suggestedTitle) {
+        return { store: askNext(s, { ...step.draft, title: step.draft.suggestedTitle }, out, false), replies: out };
+      }
       if (msg.kind !== "text") break;
       const both = splitTitleAndPrice(msg.text);
       const title = both.title ?? cleanTitle(msg.text);
@@ -126,7 +136,11 @@ export function respond(store: Store, msg: IncomingMessage, ctx: Context): Resul
       return { store: askNext(s, { ...step.draft, price }, out, false), replies: out };
     }
     case "add:confirm": {
-      if (yes) return { store: publish(s, step.draft, ctx, out), replies: out };
+      if (yes) {
+        const before = s.nextNumber;
+        const next = publish(s, step.draft, ctx, out);
+        return { store: next, replies: out, touched: next.nextNumber > before ? before : undefined };
+      }
       if (answer === "confirm:fix") {
         out.push(text("¿Qué querés cambiar?", [B.fixPhoto, B.fixTitle, B.fixPrice]));
         return { store: s, replies: out };
@@ -258,7 +272,7 @@ export function respond(store: Store, msg: IncomingMessage, ctx: Context): Resul
         s.updatedAt = ctx.now;
         set({ step: "idle" });
         out.push(text(`Listo, ya cambié la ${p.number} en tu página.\n\nSi fue un error, escribime: deshacer`));
-        return { store: s, replies: out };
+        return { store: s, replies: out, touched: p.number };
       }
       set({ step: "idle" });
       out.push(text("Bueno, no cambio nada.", MENU));
@@ -366,7 +380,10 @@ function startMenu(s: Store, id: string, out: OutgoingMessage[]): Store {
 }
 
 function askNext(s: Store, draft: Draft, out: OutgoingMessage[], fresh: boolean): Store {
-  if (!draft.title) {
+  if (!draft.title && draft.suggestedTitle) {
+    s.conversation = { step: "add:title", draft };
+    out.push(text(`${fresh ? "¡Qué linda! " : ""}¿Le pongo «${draft.suggestedTitle}»? Si no, escribime cómo se llama.`, [B.acceptTitle]));
+  } else if (!draft.title) {
     s.conversation = { step: "add:title", draft };
     out.push(text(fresh ? "¡Qué linda! ¿Cómo se llama esta pieza?" : "¿Cómo se llama esta pieza?"));
   } else if (!draft.price) {

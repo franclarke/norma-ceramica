@@ -1,5 +1,7 @@
 import "server-only";
 import { put, del, list } from "@vercel/blob";
+import { Redis } from "@upstash/redis";
+import { after } from "next/server";
 import { mkdir, readFile, writeFile, rm, readdir, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
@@ -47,8 +49,16 @@ const blobStorage: Storage = {
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 30,
     });
-    const old = (await versions(key)).slice(KEEP);
-    if (old.length) await del(old.map((b) => b.url)).catch(() => {});
+    // La limpieza de versiones viejas no hace esperar a nadie: corre después de responder.
+    const cleanup = async () => {
+      const old = (await versions(key)).slice(KEEP);
+      if (old.length) await del(old.map((b) => b.url)).catch(() => {});
+    };
+    try {
+      after(cleanup);
+    } catch {
+      await cleanup(); // fuera de un request (por ejemplo, durante el build)
+    }
   },
   async putImage(key, data, contentType) {
     const blob = await put(key, data, {
@@ -117,8 +127,38 @@ const fsStorage: Storage = {
   },
 };
 
+/*
+ * Con Upstash Redis conectado (Marketplace de Vercel), el estado de la conversación y del catálogo
+ * vive en Redis: lecturas en milisegundos y escrituras atómicas. Las fotos siguen en Blob.
+ * Las tiendas de prueba del simulador vencen solas a los 2 días.
+ */
+const redisUrl = () => process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
+const redisToken = () => process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
+let redis: Redis | null = null;
+const getRedis = () => (redis ??= new Redis({ url: redisUrl()!, token: redisToken()! }));
+const DEMO_TTL = 60 * 60 * 24 * 2;
+
+function withRedis(files: Storage): Storage {
+  return {
+    ...files,
+    async readJSON<T>(key: string) {
+      return (await getRedis().get<T>(key)) ?? null;
+    },
+    async writeJSON(key, value) {
+      const demo = key.startsWith("stores/demo-");
+      await getRedis().set(key, value, demo ? { ex: DEMO_TTL } : undefined);
+    },
+    async remove(prefix) {
+      const keys = await getRedis().keys(`${prefix}*`);
+      if (keys.length) await getRedis().del(...keys);
+      await files.remove(prefix);
+    },
+  };
+}
+
 export function getStorage(): Storage {
-  return blobEnabled() ? blobStorage : fsStorage;
+  const files = blobEnabled() ? blobStorage : fsStorage;
+  return redisUrl() && redisToken() && process.env.STORAGE !== "fs" ? withRedis(files) : files;
 }
 
 export const LOCAL_ROOT = ROOT;

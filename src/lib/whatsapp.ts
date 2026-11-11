@@ -80,6 +80,7 @@ export type WebhookMessage = {
   type: string;
   text?: { body: string };
   image?: { id: string; caption?: string };
+  audio?: { id: string; mime_type?: string; voice?: boolean };
   interactive?: { type: string; button_reply?: { id: string; title: string } };
   button?: { text: string; payload: string };
 };

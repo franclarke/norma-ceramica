@@ -1,10 +1,9 @@
 import { after } from "next/server";
 import { revalidateTag } from "next/cache";
-import { runTurn, siteUrl } from "@/lib/bot/run";
+import { runTurn, siteUrl, type ChannelMessage } from "@/lib/bot/run";
 import { processPhoto } from "@/lib/images";
 import { loadStore, NORMA, storeTag } from "@/lib/store";
 import { downloadMedia, extractMessages, isOwner, markRead, sendMessages, verifySignature, type WebhookMessage } from "@/lib/whatsapp";
-import type { IncomingMessage } from "@/lib/types";
 
 // Verificación del webhook que hace Meta al configurarlo.
 export async function GET(req: Request) {
@@ -55,7 +54,7 @@ async function handle(m: WebhookMessage) {
   await markRead(m.id);
   const incoming = await toIncoming(m);
   if (!incoming) {
-    await sendMessages(m.from, [{ kind: "text", text: "Todavía no sé escuchar audios ni ver videos. Escribime o mandame una foto, porfa." }], base);
+    await sendMessages(m.from, [{ kind: "text", text: "Eso no lo sé abrir todavía. Escribime, mandame un audio o una foto, porfa." }], base);
     return;
   }
   const { replies, duplicate, changed } = await runTurn(NORMA, incoming, { messageId: m.id });
@@ -64,7 +63,7 @@ async function handle(m: WebhookMessage) {
   await sendMessages(m.from, replies, base);
 }
 
-async function toIncoming(m: WebhookMessage): Promise<IncomingMessage | null> {
+async function toIncoming(m: WebhookMessage): Promise<ChannelMessage | null> {
   if (m.type === "text" && m.text) return { kind: "text", text: m.text.body };
   if (m.type === "interactive" && m.interactive?.button_reply) {
     return { kind: "button", id: m.interactive.button_reply.id, title: m.interactive.button_reply.title };
@@ -74,5 +73,6 @@ async function toIncoming(m: WebhookMessage): Promise<IncomingMessage | null> {
     const { photo, dark } = await processPhoto(NORMA, await downloadMedia(m.image.id));
     return { kind: "image", photo, caption: m.image.caption, dark };
   }
+  if ((m.type === "audio" || m.type === "voice") && m.audio) return { kind: "audio", audio: new Uint8Array(await downloadMedia(m.audio.id)) };
   return null;
 }

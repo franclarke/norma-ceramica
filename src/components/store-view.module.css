@@ -142,8 +142,14 @@
 .slab {
   position: relative;
   aspect-ratio: 1 / 1.14;
-  background: var(--slab) center / 100% 100% no-repeat;
   filter: drop-shadow(0 14px 14px rgb(2 6 40 / 0.55)) drop-shadow(0 2px 3px rgb(2 6 40 / 0.45));
+}
+
+/* La losa de gres (raster): ocupa toda la tablilla. */
+.slabImage {
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* La foto, embutida en el esmalte como una ventanita. */
@@ -337,5 +343,59 @@
 @media (min-width: 1360px) {
   .wall:not([data-compact]) .tiles {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- El link de una pieza (/14) ---------- */
+.featured {
+  display: grid;
+  gap: 22px;
+  max-width: 34rem;
+  margin-bottom: clamp(48px, 7vw, 72px);
+}
+
+.featuredTitle {
+  margin: 0;
+  font-size: var(--step-1);
+  font-weight: 800;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.featuredTile {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.featuredAsk {
+  margin: 6px 0 0;
+  font-size: var(--step-1);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.allTitle {
+  margin: clamp(32px, 5vw, 48px) 0 0;
+  font-size: var(--step-1);
+  font-weight: 800;
+}
+
+/* En el celular, el link de una pieza abre con la pieza: arriba queda solo el logo. */
+@media (max-width: 1023px) {
+  .wall[data-featured] .hello,
+  .wall[data-featured] .intro .contact,
+  .wall[data-featured] .updated {
+    display: none;
+  }
+  .wall[data-featured] .intro {
+    padding-bottom: 0;
+  }
+  .wall[data-featured] .main {
+    padding-top: 18px;
   }
 }

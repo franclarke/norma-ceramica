@@ -2,12 +2,12 @@
 
 import { cookies } from "next/headers";
 import { updateTag } from "next/cache";
-import { runTurn } from "@/lib/bot/run";
+import { runTurn, type ChannelMessage } from "@/lib/bot/run";
 import { processPhoto } from "@/lib/images";
 import { SAMPLE_PHOTOS } from "@/lib/samples";
 import { isDemoId, saveStore, storeTag } from "@/lib/store";
 import { seedStore } from "@/lib/seed";
-import type { ChatEntry, IncomingMessage } from "@/lib/types";
+import type { ChatEntry } from "@/lib/types";
 
 const SIM_COOKIE = "norma-sim";
 
@@ -23,9 +23,14 @@ export async function sendToBot(form: FormData): Promise<SendResult> {
   try {
     const id = await sandboxId();
     const kind = String(form.get("kind"));
-    let incoming: IncomingMessage;
+    let incoming: ChannelMessage;
 
-    if (kind === "text") {
+    if (kind === "audio") {
+      const file = form.get("file");
+      if (!(file instanceof File) || file.size === 0) return { ok: false, error: "No llegó el audio." };
+      if (file.size > 6 * 1024 * 1024) return { ok: false, error: "El audio es muy largo." };
+      incoming = { kind: "audio", audio: new Uint8Array(await file.arrayBuffer()) };
+    } else if (kind === "text") {
       const text = String(form.get("text") ?? "").slice(0, 500).trim();
       if (!text) return { ok: false, error: "Escribí algo antes de mandar." };
       incoming = { kind: "text", text };

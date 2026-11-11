@@ -23,15 +23,17 @@ export type OutgoingMessage =
   | { kind: "image"; photo: Photo; caption: string; buttons?: ReplyButton[] };
 
 export type IncomingMessage =
-  | { kind: "text"; text: string }
+  | { kind: "text"; text: string; voice?: boolean }
   | { kind: "button"; id: string; title: string }
-  | { kind: "image"; photo: Photo; caption?: string; dark?: boolean };
+  | { kind: "image"; photo: Photo; caption?: string; dark?: boolean; suggestedTitle?: string };
 
 /** Lo que el bot está esperando de Norma. */
 export type Draft = {
   photo?: Photo;
   title?: string;
   price?: number;
+  /** Nombre que propuso la IA mirando la foto (Norma lo acepta o escribe otro). */
+  suggestedTitle?: string;
   /** Si está editando una pieza existente. */
   number?: number;
 };

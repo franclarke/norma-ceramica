@@ -10,23 +10,28 @@ import s from "./store-view.module.css";
 const GLAZES = ["celadon", "ironred", "shino", "ash"] as const;
 const glazeOf = (n: number) => GLAZES[n % GLAZES.length];
 
+// Ancho real de una tablilla en cada pantalla (1 columna, 2 columnas, pared de 2 y de 3).
+const SIZES = "(min-width: 1360px) 22vw, (min-width: 1024px) 33vw, (min-width: 640px) 46vw, 92vw";
+const PHOTO_SIZES = "(min-width: 1360px) 18vw, (min-width: 1024px) 27vw, (min-width: 640px) 38vw, 76vw";
+
 // Cada tablilla cuelga un poquito torcida de su clavo, siempre igual para la misma pieza.
 const tilt = (n: number) => (((n * 37) % 11) - 5) * 0.16;
 
 const updatedLabel = (iso: string) =>
   new Intl.DateTimeFormat("es-AR", { weekday: "long", day: "numeric", month: "long", timeZone: "America/Argentina/Buenos_Aires" }).format(new Date(iso));
 
-export function StoreView({ store, compact = false }: { store: PublicStore; compact?: boolean }) {
-  const { pieces } = store;
+export function StoreView({ store, compact = false, featured }: { store: PublicStore; compact?: boolean; featured?: number }) {
+  // En el link de una pieza (/14), esa pieza va primero y grande; el resto sigue abajo.
+  const shared = featured !== undefined ? store.pieces.find((p) => p.number === featured) : undefined;
+  const pieces = shared ? store.pieces.filter((p) => p !== shared) : store.pieces;
   // Fondos que vienen por CSS: se avisan temprano para que no demoren la primera pantalla.
   // (En la vista compacta del simulador no: vive en un iframe que a veces está oculto.)
   if (!compact) {
     preload("/plates/glaze-cobalt.webp", { as: "image", fetchPriority: "high" });
     preload("/plates/logo.webp", { as: "image", fetchPriority: "high" });
-    for (const p of pieces.slice(0, 2)) preload(`/plates/tile-${glazeOf(p.number)}.webp`, { as: "image", fetchPriority: "high" });
   }
   return (
-    <div className={s.wall} data-compact={compact || undefined}>
+    <div className={s.wall} data-compact={compact || undefined} data-featured={featured !== undefined || undefined}>
       <header className={s.intro}>
         <div className={s.introInner}>
           <h1 className={s.logo}>
@@ -40,10 +45,32 @@ export function StoreView({ store, compact = false }: { store: PublicStore; comp
       </header>
 
       <main className={s.main}>
+        {featured !== undefined && (
+          <section className={s.featured} aria-labelledby="compartida">
+            {shared ? (
+              <>
+                <h2 id="compartida" className={s.featuredTitle}>
+                  Te compartieron la pieza Nº {shared.number}
+                </h2>
+                <ul className={s.featuredTile}>
+                  <Tile piece={shared} priority />
+                </ul>
+                <p className={s.featuredAsk}>
+                  ¿Te gustó? Escribime al <strong className={s.nowrap}>{store.contactPhone}</strong> y contame que es la {shared.number}.
+                </p>
+              </>
+            ) : (
+              <h2 id="compartida" className={s.featuredTitle}>
+                La pieza Nº {featured} ya no está: seguro se vendió. Mirá las que tengo ahora.
+              </h2>
+            )}
+            <h2 className={s.allTitle}>{shared ? "Las demás piezas del taller" : "Las piezas del taller"}</h2>
+          </section>
+        )}
         {pieces.length ? (
           <ul className={s.tiles} id="piezas" aria-label={`${pieces.length} piezas`}>
             {pieces.map((p, i) => (
-              <Tile key={p.number} piece={p} priority={i < 2} />
+              <Tile key={p.number} piece={p} priority={!shared && i < 2} />
             ))}
           </ul>
         ) : (
@@ -64,7 +91,7 @@ export function StoreView({ store, compact = false }: { store: PublicStore; comp
                 </tr>
               </thead>
               <tbody>
-                {pieces.map((p) => (
+                {store.pieces.map((p) => (
                   <tr key={p.number}>
                     <td>{p.number}</td>
                     <td>{p.title}</td>
@@ -111,15 +138,16 @@ function Contact({ phone, again = false }: { phone: string; again?: boolean }) {
 function Tile({ piece, priority }: { piece: Piece; priority: boolean }) {
   const glaze = glazeOf(piece.number);
   return (
-    <li className={s.tile} style={{ "--tilt": `${tilt(piece.number)}deg`, "--slab": `url(/plates/tile-${glaze}.webp)` } as CSSProperties}>
+    <li className={s.tile} id={`pieza-${piece.number}`} style={{ "--tilt": `${tilt(piece.number)}deg` } as CSSProperties}>
       <article className={s.slab} aria-label={`Pieza número ${piece.number}: ${piece.title}, ${formatPrice(piece.price)}`}>
+        <Image src={`/plates/tile-${glaze}.webp`} alt="" fill sizes={SIZES} priority={priority} className={s.slabImage} />
         <div className={s.window}>
           <Image
             src={piece.photo.url}
             alt={piece.title}
             width={piece.photo.width}
             height={piece.photo.height}
-            sizes="(min-width: 1280px) 22vw, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 88vw"
+            sizes={PHOTO_SIZES}
             priority={priority}
             className={s.photo}
           />

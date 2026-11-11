@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { isDemoId, loadStore } from "@/lib/store";
+import { aiAvailable } from "@/lib/bot/ai";
 import { SAMPLE_PHOTOS } from "@/lib/samples";
 import { Simulator } from "./simulator";
 import s from "./simulador.module.css";
@@ -40,5 +41,5 @@ async function SimulatorLoader() {
   const id = (await cookies()).get("norma-sim")?.value;
   if (!id || !isDemoId(id)) redirect("/simulador/nuevo");
   const store = await loadStore(id);
-  return <Simulator storeId={id} initialChat={store.chat ?? []} samples={SAMPLE_PHOTOS} />;
+  return <Simulator storeId={id} initialChat={store.chat ?? []} samples={SAMPLE_PHOTOS} voice={await aiAvailable()} />;
 }

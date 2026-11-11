@@ -126,3 +126,21 @@ describe("conversación", () => {
     expect((r.replies[0] as { text: string }).text).toMatch(/99/);
   });
 });
+
+describe("nombre sugerido por la foto", () => {
+  it("Norma acepta el nombre que propone la IA con un toque", () => {
+    let r = talk(emptyStore(), { kind: "image", photo, suggestedTitle: "Taza celeste" });
+    expect(r.store.conversation.step).toBe("add:title");
+    expect((r.replies[0] as { text: string }).text).toMatch(/Taza celeste/);
+    r = respond(r.store, { kind: "button", id: "title:accept", title: "Sí, ponele ese" }, ctx);
+    expect(r.store.conversation.step).toBe("add:price");
+    r = talk(r.store, "8500", yes);
+    expect(r.store.pieces[0]).toMatchObject({ title: "Taza celeste", price: 8500 });
+    expect(r.touched).toBe(1);
+  });
+
+  it("o escribe otro nombre", () => {
+    const r = talk(emptyStore(), { kind: "image", photo, suggestedTitle: "Taza celeste" }, "taza de mi abuela", "9000", yes);
+    expect(r.store.pieces[0].title).toBe("Taza de mi abuela");
+  });
+});

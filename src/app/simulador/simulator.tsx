@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Camera, Check, CheckCheck, ImagePlus, RotateCcw, SendHorizontal, Upload, X } from "lucide-react";
+import { Camera, Check, CheckCheck, ImagePlus, Mic, RotateCcw, SendHorizontal, Upload, X } from "lucide-react";
 import { resetSandbox, sendToBot, type SendResult } from "./actions";
 import type { ChatEntry, IncomingMessage, OutgoingMessage, Photo, ReplyButton } from "@/lib/types";
 import s from "./simulador.module.css";
@@ -11,7 +11,62 @@ type Pending = { id: string; message: IncomingMessage };
 
 const TRIES = ["hola", "vendí la 14", "la 23 ahora sale 13000", "volví a tener la 14", "deshacer", "lista"];
 
-export function Simulator({ storeId, initialChat, samples }: { storeId: string; initialChat: ChatEntry[]; samples: Sample[] }) {
+const formatSeconds = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
+
+/** Grabador de audio como el de WhatsApp: tocar para grabar, tocar para mandar. */
+function useRecorder(onAudio: (file: File) => void, onError: (msg: string) => void) {
+  const [state, setState] = useState<{ rec: MediaRecorder; started: number } | null>(null);
+  const [seconds, setSeconds] = useState(0);
+  const send = useRef(true);
+
+  useEffect(() => {
+    if (!state) return;
+    const t = setInterval(() => setSeconds(Math.floor((Date.now() - state.started) / 1000)), 250);
+    return () => clearInterval(t);
+  }, [state]);
+
+  async function start() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const type = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+      const rec = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+      rec.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        setState(null);
+        setSeconds(0);
+        if (!send.current || !chunks.length) return;
+        const mime = rec.mimeType || "audio/webm";
+        onAudio(new File(chunks, `audio.${mime.includes("mp4") ? "m4a" : "webm"}`, { type: mime }));
+      };
+      send.current = true;
+      rec.start();
+      setState({ rec, started: Date.now() });
+    } catch {
+      onError("No pude usar el micrófono. Fijate que el navegador tenga permiso.");
+    }
+  }
+
+  function stop(shouldSend: boolean) {
+    send.current = shouldSend;
+    state?.rec.stop();
+  }
+
+  return { recording: Boolean(state), seconds, start, stop };
+}
+
+export function Simulator({
+  storeId,
+  initialChat,
+  samples,
+  voice,
+}: {
+  storeId: string;
+  initialChat: ChatEntry[];
+  samples: Sample[];
+  voice: boolean;
+}) {
   const [chat, setChat] = useState(initialChat);
   const [pending, setPending] = useState<Pending | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +121,17 @@ export function Simulator({ storeId, initialChat, samples }: { storeId: string; 
     f.set("title", b.title);
     send(f, { kind: "button", id: b.id, title: b.title });
   }
+
+  const recorder = useRecorder(
+    (file) => {
+      const f = new FormData();
+      f.set("kind", "audio");
+      f.set("file", file);
+      send(f, { kind: "text", text: "Audio", voice: true });
+    },
+    (msg) => setError(msg),
+  );
+  const recording = recorder.recording;
 
   function sendPhoto() {
     if (!draft || isPending) return;
@@ -138,6 +204,7 @@ export function Simulator({ storeId, initialChat, samples }: { storeId: string; 
                   {"• «vendí la 14» para sacar una que vendiste.\n"}
                   {"• «la 23 ahora sale 13000» para cambiar un precio.\n"}
                   {"• «deshacer» si te equivocaste."}
+                  {voice && "\n\nO mandame un audio con tus palabras, como «la jarrita blanca ya la vendí». Tocá el micrófono."}
                 </p>
                 <span className={s.meta}>Mi página</span>
               </div>
@@ -185,29 +252,49 @@ export function Simulator({ storeId, initialChat, samples }: { storeId: string; 
             ))}
           </div>
 
-          <form
-            className={s.composer}
-            onSubmit={(e) => {
-              e.preventDefault();
-              sendText(text);
-            }}
-          >
-            <button type="button" className={s.iconButton} onClick={() => setPicker(true)} aria-label="Mandar una foto" disabled={isPending}>
-              <Camera size={24} aria-hidden />
-            </button>
-            <input
-              className={s.input}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Escribí un mensaje"
-              aria-label="Mensaje para la página"
-              enterKeyHint="send"
-              maxLength={500}
-            />
-            <button type="submit" className={s.send} aria-label="Mandar" disabled={isPending || !text.trim()}>
-              <SendHorizontal size={22} aria-hidden />
-            </button>
-          </form>
+          {recording ? (
+            <div className={s.composer} role="status">
+              <button type="button" className={s.iconButton} onClick={() => recorder.stop(false)} aria-label="Cancelar el audio">
+                <X size={24} aria-hidden />
+              </button>
+              <span className={s.recording}>
+                <i aria-hidden /> Grabando… {formatSeconds(recorder.seconds)}
+              </span>
+              <button type="button" className={s.send} onClick={() => recorder.stop(true)} aria-label="Mandar el audio">
+                <SendHorizontal size={22} aria-hidden />
+              </button>
+            </div>
+          ) : (
+            <form
+              className={s.composer}
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendText(text);
+              }}
+            >
+              <button type="button" className={s.iconButton} onClick={() => setPicker(true)} aria-label="Mandar una foto" disabled={isPending}>
+                <Camera size={24} aria-hidden />
+              </button>
+              <input
+                className={s.input}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder={voice ? "Escribí, o tocá el micrófono" : "Escribí un mensaje"}
+                aria-label="Mensaje para la página"
+                enterKeyHint="send"
+                maxLength={500}
+              />
+              {voice && !text.trim() ? (
+                <button type="button" className={s.send} onClick={() => recorder.start()} aria-label="Grabar un audio" disabled={isPending}>
+                  <Mic size={22} aria-hidden />
+                </button>
+              ) : (
+                <button type="submit" className={s.send} aria-label="Mandar" disabled={isPending || !text.trim()}>
+                  <SendHorizontal size={22} aria-hidden />
+                </button>
+              )}
+            </form>
+          )}
 
           {picker && (
             <div className={s.sheet} role="dialog" aria-modal="true" aria-label="Elegí una foto">
@@ -329,9 +416,19 @@ function Bubble({
       <div className={`${s.bubble} ${mine ? s.out : s.in}`}>
         {m.kind === "image" && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className={s.bubblePhoto} src={m.photo.url} alt={mine ? "Foto que mandó Norma" : "Vista previa de la pieza"} />
+          <img
+            className={s.bubblePhoto}
+            src={m.photo.url}
+            style={m.photo.width / m.photo.height > 1.5 ? { aspectRatio: `${m.photo.width} / ${m.photo.height}` } : undefined}
+            alt={mine ? "Foto que mandó Norma" : "Vista previa de la pieza"}
+          />
         )}
-        {body && <p className={s.bubbleText}>{body}</p>}
+        {m.kind === "text" && "voice" in m && m.voice && (
+          <span className={s.voice}>
+            <Mic size={16} aria-hidden /> {sending ? "Audio · escuchando…" : "Audio · lo que entendí:"}
+          </span>
+        )}
+        {body && !(sending && m.kind === "text" && "voice" in m && m.voice) && <p className={s.bubbleText}>{body}</p>}
         <span className={s.meta}>
           {time}
           {mine && (sending ? <Check size={14} aria-hidden /> : <CheckCheck size={14} aria-hidden className={s.read} />)}
