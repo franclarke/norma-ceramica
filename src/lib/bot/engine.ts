@@ -49,7 +49,7 @@ export function respond(store: Store, msg: IncomingMessage, ctx: Context): Resul
       out.push(text("Listo, lo dejamos ahí. No cambié nada.", MENU));
       return { store: s, replies: out };
     }
-    if (intent.type === "undo") return { store: undo(s, out), replies: out };
+    if (intent.type === "undo") return { store: undo(s, out, ctx.now), replies: out };
     if (intent.type === "help") {
       out.push(help());
       return { store: s, replies: out };
@@ -458,7 +458,7 @@ function help(): OutgoingMessage {
   );
 }
 
-function undo(s: Store, out: OutgoingMessage[]): Store {
+function undo(s: Store, out: OutgoingMessage[], now: string): Store {
   const last = s.undo.pop();
   s.conversation = { step: "idle" };
   if (!last) {
@@ -467,6 +467,7 @@ function undo(s: Store, out: OutgoingMessage[]): Store {
   }
   s.pieces = last.pieces;
   s.sold = last.sold;
+  s.updatedAt = now;
   out.push(text(`Listo, deshice lo último: ${last.label}. La página quedó como antes.`));
   return s;
 }

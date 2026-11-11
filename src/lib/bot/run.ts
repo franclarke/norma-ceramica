@@ -19,7 +19,8 @@ export async function runTurn(storeId: string, incoming: IncomingMessage, opts: 
   if (opts.messageId) next.processed = [...(store.processed ?? []), opts.messageId].slice(-50);
   if (next.demo) next.chat = appendChat(next, incoming, replies, now);
   await saveStore(next);
-  return { store: next, replies, duplicate: false, changed: next.updatedAt !== store.updatedAt };
+  const changed = next.updatedAt !== store.updatedAt || JSON.stringify(next.pieces) !== JSON.stringify(store.pieces);
+  return { store: next, replies, duplicate: false, changed };
 }
 
 function appendChat(store: Store, incoming: IncomingMessage, replies: OutgoingMessage[], now: string): ChatEntry[] {
