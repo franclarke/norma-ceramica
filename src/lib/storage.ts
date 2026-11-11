@@ -1,5 +1,5 @@
 import "server-only";
-import { put, get, del, list } from "@vercel/blob";
+import { put, del, list } from "@vercel/blob";
 import { mkdir, readFile, writeFile, rm, readdir, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
@@ -18,20 +18,37 @@ export interface Storage {
 
 const blobEnabled = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN) && process.env.STORAGE !== "fs";
 
+/*
+ * Sobrescribir el mismo archivo en Blob deja lecturas viejas durante minutos (lo vimos en
+ * producción). Por eso cada guardado es una versión nueva e inmutable
+ * (stores/<id>/store/<timestamp>.json) y se lee siempre la última que lista Blob, que sí es
+ * consistente. Se conservan las últimas versiones y se borran las demás.
+ */
+const versionsOf = (key: string) => `${key.replace(/\.json$/, "")}/`;
+const KEEP = 4;
+
+async function versions(key: string) {
+  const { blobs } = await list({ prefix: versionsOf(key), limit: 1000 });
+  return blobs.sort((a, b) => (a.pathname < b.pathname ? 1 : -1)); // la más nueva primero
+}
+
 const blobStorage: Storage = {
   async readJSON<T>(key: string) {
-    const res = await get(key, { access: "public", useCache: false });
-    if (!res || res.statusCode !== 200) return null;
-    return (await new Response(res.stream).json()) as T;
+    const [latest] = await versions(key);
+    if (!latest) return null;
+    const res = await fetch(latest.url, { cache: "no-store" });
+    return res.ok ? ((await res.json()) as T) : null;
   },
   async writeJSON(key, value) {
-    await put(key, JSON.stringify(value), {
+    const stamp = `${String(Date.now()).padStart(15, "0")}-${Math.random().toString(36).slice(2, 8)}`;
+    await put(`${versionsOf(key)}${stamp}.json`, JSON.stringify(value), {
       access: "public",
       contentType: "application/json",
       addRandomSuffix: false,
-      allowOverwrite: true,
-      cacheControlMaxAge: 60,
+      cacheControlMaxAge: 60 * 60 * 24 * 30,
     });
+    const old = (await versions(key)).slice(KEEP);
+    if (old.length) await del(old.map((b) => b.url)).catch(() => {});
   },
   async putImage(key, data, contentType) {
     const blob = await put(key, data, {
