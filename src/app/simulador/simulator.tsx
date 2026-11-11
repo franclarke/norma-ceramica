@@ -129,9 +129,19 @@ export function Simulator({ storeId, initialChat, samples }: { storeId: string; 
           </div>
 
           <div className={s.thread} ref={scroller} aria-live="polite">
-            <p className={s.system}>
-              Este es el chat de Norma con su página. Escribile <strong>hola</strong>, o mandá una foto con la cámara.
-            </p>
+            <p className={s.system}>Sos Norma. Este es tu chat con tu página.</p>
+            <div className={`${s.row} ${s.rowIn}`}>
+              <div className={`${s.bubble} ${s.in}`}>
+                <p className={s.bubbleText}>
+                  {"¡Hola, Norma! Escribime como a cualquier persona:\n\n"}
+                  {"• Mandame una foto para agregar una pieza (tocá la cámara de abajo).\n"}
+                  {"• «vendí la 14» para sacar una que vendiste.\n"}
+                  {"• «la 23 ahora sale 13000» para cambiar un precio.\n"}
+                  {"• «deshacer» si te equivocaste."}
+                </p>
+                <span className={s.meta}>Mi página</span>
+              </div>
+            </div>
             {chat.map((e, i) => (
               <Bubble
                 key={e.id}
@@ -141,6 +151,17 @@ export function Simulator({ storeId, initialChat, samples }: { storeId: string; 
               />
             ))}
             {pending && <Bubble entry={{ id: "p", from: "norma", at: "", message: pending.message }} sending />}
+            {updated && !isPending && (
+              <button
+                className={s.seeChange}
+                onClick={() => {
+                  setTab("page");
+                  setUpdated(false);
+                }}
+              >
+                Ver cómo quedó la página
+              </button>
+            )}
             {isPending && (
               <div className={`${s.bubble} ${s.in} ${s.typing}`} aria-label="Escribiendo">
                 <i />

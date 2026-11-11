@@ -17,7 +17,7 @@
 .home {
   display: block;
   width: clamp(120px, 16vw, 190px);
-  aspect-ratio: 1024 / 365;
+  aspect-ratio: 698 / 333;
   color: var(--glaze-white);
   margin-top: 4px;
 }
@@ -270,7 +270,7 @@
   max-width: 86%;
   margin: 0 0 8px;
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.4;
   color: #54656f;
   background: #fff6c5;
@@ -406,8 +406,8 @@
 
 .tries {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
-  overflow-x: auto;
   padding: 8px 10px;
   background: #efeae2;
   scrollbar-width: none;
@@ -627,6 +627,29 @@
     border-radius: 18px;
   }
   .reset span {
+    display: none;
+  }
+}
+
+/* Atajo para ver el cambio (solo hace falta cuando las dos pantallas no están a la vista) */
+.seeChange {
+  align-self: center;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1b1200;
+  background: var(--amber);
+  border: 0;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 8px 18px;
+  margin-top: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
+}
+
+@media (min-width: 1024px) {
+  .seeChange {
     display: none;
   }
 }

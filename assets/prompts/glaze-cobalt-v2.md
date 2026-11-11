@@ -1,0 +1,3 @@
+Square image, 1024x1024.
+
+SUBJECT: a real macro photograph, shot straight on, of a flat ceramic surface covered in a glossy, saturated COBALT BLUE glaze (bright royal cobalt, like a Delft or Talavera blue, mean colour close to #1C2A8E), filling the entire frame edge to edge. Fine crackle (crazing) lines across the whole surface, gentle pooling where the glaze is thicker and slightly darker, a few soft, diffuse gloss highlights from a large window light (never a sharp reflection of an object). Even overall brightness so white text stays readable on any part of it. No edges, no objects, no text, no vignette. It must look like a real fired glaze, not a digital texture.
