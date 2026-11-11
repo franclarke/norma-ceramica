@@ -38,7 +38,7 @@ Respeté el boceto: no hay carrito ni link, el que quiere algo le escribe.
 **5/**
 Para el diseño no quería una tienda ni el look de siempre.
 
-Los ceramistas hacen tablillas de prueba de esmalte y les graban un número en el barro. La página es esa pared del taller: cada pieza es una tablilla colgada de un clavo, con su número grabado.
+Los ceramistas hacen tablillas de prueba de esmalte y les graban un número en el barro. La página es esa pared del taller: cada pieza es una tablilla colgada de un clavo, con su número en el barro.
 
 [captura de escritorio]
 

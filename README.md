@@ -1,6 +1,6 @@
 # Norma · cerámica
 
-La página de la tía Norma: una pared de su taller donde cuelga sus piezas como **tablillas de prueba de esmalte**, cada una con su número grabado en el barro. Norma la actualiza **desde WhatsApp**, conversando, sin aprender nada nuevo.
+La página de la tía Norma: una pared de su taller donde cuelga sus piezas como **tablillas de prueba de esmalte**, cada una con su número en la franja de barro. Norma la actualiza **desde WhatsApp**, conversando, sin aprender nada nuevo.
 
 - **Página:** https://norma-ceramica.vercel.app
 - **Simulador (hacé de Norma):** https://norma-ceramica.vercel.app/simulador
