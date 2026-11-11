@@ -23,7 +23,7 @@
 }
 
 html {
-  background: var(--cobalt-deep);
+  background: var(--cobalt);
   color: var(--glaze-white);
   font-family: var(--font);
   -webkit-text-size-adjust: 100%;
@@ -35,8 +35,18 @@ body {
   min-height: 100dvh;
   font-size: var(--step-0);
   line-height: 1.5;
-  background: var(--cobalt) url(/plates/glaze-cobalt.webp) center top / 720px repeat;
+  background: transparent;
   -webkit-font-smoothing: antialiased;
+}
+
+/* La pared: una sola foto de esmalte, quieta detrás de todo (sin mosaico ni repeticiones). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--cobalt) url(/plates/glaze-cobalt.webp) center / cover no-repeat;
+  pointer-events: none;
 }
 
 ::selection {

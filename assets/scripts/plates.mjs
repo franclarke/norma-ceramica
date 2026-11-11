@@ -63,25 +63,15 @@ async function tile(name) {
 }
 
 async function glaze() {
-  // Se comprime el rango tonal hacia un cobalto fijo: se conserva el craquelado y el brillo,
-  // pero ningún punto queda tan claro como para bajar el contraste del texto blanco de 7:1.
-  const { data, info } = await sharp(join(ROOT, "raw", "glaze-cobalt-v2.png")).resize(720, 720).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  // Una sola imagen grande, sin mosaico (los espejados repetían manchas como un empapelado).
+  // Se comprime el rango tonal hacia un cobalto fijo: queda el craquelado y el brillo suave,
+  // pero ningún punto baja el contraste del texto blanco de 7:1.
+  const { data, info } = await sharp(join(ROOT, "raw", "glaze-cobalt-v2.png")).resize(1600, 1600).blur(0.6).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const target = [10, 28, 140];
-  const k = 0.42;
-  for (let i = 0; i < data.length; i += 3) for (let c = 0; c < 3; c++) data[i + c] = Math.max(0, Math.min(255, Math.round(target[c] + (data[i + c] - [12, 37, 165][c]) * k)));
-  const base = await sharp(data, { raw: info }).png().toBuffer();
-  const flipX = await sharp(base).flop().toBuffer();
-  const flipY = await sharp(base).flip().toBuffer();
-  const both = await sharp(base).flip().flop().toBuffer();
-  await sharp({ create: { width: 1440, height: 1440, channels: 3, background: "#000" } })
-    .composite([
-      { input: base, left: 0, top: 0 },
-      { input: flipX, left: 720, top: 0 },
-      { input: flipY, left: 0, top: 720 },
-      { input: both, left: 720, top: 720 },
-    ])
-    .webp({ quality: 72 })
-    .toFile(join(OUT, "glaze-cobalt.webp"));
+  const src = [12, 37, 165];
+  const k = 0.36;
+  for (let i = 0; i < data.length; i += 3) for (let c = 0; c < 3; c++) data[i + c] = Math.max(0, Math.min(255, Math.round(target[c] + (data[i + c] - src[c]) * k)));
+  await sharp(data, { raw: info }).webp({ quality: 70 }).toFile(join(OUT, "glaze-cobalt.webp"));
   const { dominant } = await sharp(join(OUT, "glaze-cobalt.webp")).stats();
   return dominant;
 }
