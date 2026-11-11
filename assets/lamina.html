@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lámina de assets · Norma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6eee0;
+    --paper-deep: #ebdfcb;
+    --ink: #2a211b;
+    --ink-soft: #5b4d42;
+    --clay: #b4532a;
+    --clay-ink: #8a3a1e;
+    --photo: #e4d4bf;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper) url(out/paper/paper.webp) repeat;
+    background-size: 512px;
+    color: var(--ink);
+    font: 400 1.3125rem/1.5 "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 16px 96px; }
+  .ink, .clay {
+    display: block;
+    background: var(--ink);
+    -webkit-mask: var(--src) center / contain no-repeat;
+    mask: var(--src) center / contain no-repeat;
+  }
+  .clay { background: var(--clay); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+  /* --- Maqueta --- */
+  .label {
+    font-size: .9rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+    border-bottom: 1px solid #d8cab3; padding-bottom: 8px; margin: 72px 0 32px;
+  }
+  .label:first-child { margin-top: 0; }
+  header.store { display: grid; gap: 20px; max-width: 46rem; }
+  header.store h1 { margin: 0; }
+  header.store .logo { width: min(340px, 80vw); aspect-ratio: var(--ar); }
+  header.store p { margin: 0; font-size: 1.4rem; }
+  .contact { font-size: 1.4rem; line-height: 1.6; }
+  .phone { position: relative; display: inline-block; font-weight: 800; white-space: nowrap; padding: 0 .6em; margin: 0 .1em; }
+  .phone .loop {
+    position: absolute; inset: -0.45em -0.15em -0.4em -0.2em; pointer-events: none;
+    -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  }
+  .updated { font-size: 1rem; color: var(--ink-soft); }
+
+  .grid { display: grid; gap: 56px 40px; grid-template-columns: 1fr; margin-top: 56px; }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .piece { margin: 0; }
+  .photo-wrap { position: relative; padding-top: 18px; }
+  .photo {
+    position: relative; aspect-ratio: 4 / 5; background: var(--photo);
+    box-shadow: 0 1px 2px rgb(60 40 20 / .18), 0 8px 18px -10px rgb(60 40 20 / .35);
+    rotate: var(--tilt, 0deg); display: grid; place-items: center;
+  }
+  .photo .doodle { width: 46%; aspect-ratio: var(--ar); opacity: .28; }
+  .tape { position: absolute; top: 0; left: 50%; width: 42%; translate: -50% 0; rotate: var(--tape-tilt, -3deg); z-index: 2; }
+  .stamp {
+    position: absolute; right: -10px; bottom: -22px; width: 92px; aspect-ratio: 1;
+    display: grid; place-items: center; rotate: var(--stamp-tilt, -6deg); z-index: 2;
+  }
+  .stamp::before { content: ""; position: absolute; inset: 9%; border-radius: 50%; background: var(--paper); }
+  .stamp .ring { position: absolute; inset: 0; }
+  .stamp b { position: relative; font-size: 2rem; font-weight: 800; color: var(--clay-ink); line-height: 1; }
+  .piece figcaption { margin-top: 30px; display: grid; gap: 2px; }
+  .piece .title { font-size: 1.6rem; font-weight: 700; line-height: 1.25; }
+  .piece .price { font-size: 1.9rem; font-weight: 800; }
+
+  /* --- Catálogo --- */
+  .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 28px; }
+  .catalog.wide { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .item { display: grid; gap: 8px; justify-items: center; }
+  .item .art { width: 100%; height: 130px; }
+  .catalog.wide .item .art { height: 210px; }
+  .item img.art { object-fit: contain; }
+  .item code { font: 600 .85rem/1 ui-monospace, monospace; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h2 class="label">1 · Así se vería la página (maqueta, sin fotos todavía)</h2>
+
+  <header class="store">
+    <h1><span class="sr">Norma, cerámica</span><span class="ink logo" id="logo"></span></h1>
+    <p>Hola, soy Norma. Estas son las piezas que tengo ahora en el taller. Las hago yo, una por una.</p>
+    <p class="contact">
+      ¿Te gustó alguna? Escribime al
+      <span class="phone">11 2345-6789<span class="ink loop" id="loop"></span></span>
+      y contame cuál. Cada pieza tiene su numerito, así no nos confundimos.
+    </p>
+    <p class="updated">Actualizado el miércoles 11 de noviembre</p>
+  </header>
+
+  <section class="grid" id="pieces" aria-label="Piezas"></section>
+
+  <h2 class="label">2 · Logo: elegí uno</h2>
+  <div class="catalog wide" id="logos"></div>
+
+  <h2 class="label">3 · Sellos para el número</h2>
+  <div class="catalog" id="stamps"></div>
+
+  <h2 class="label">4 · Dibujitos</h2>
+  <div class="catalog" id="doodles"></div>
+
+  <h2 class="label">5 · Trazos</h2>
+  <div class="catalog" id="strokes"></div>
+
+  <h2 class="label">6 · Cinta de papel</h2>
+  <div class="catalog" id="tape"></div>
+</main>
+
+<script type="module">
+  const manifest = await fetch("out/manifest.json").then((r) => r.json());
+  const files = (sheet) => manifest[sheet]?.files ?? [];
+  const pick = (sheet, n) => files(sheet)[n - 1];
+  const masked = (el, f) => { el.style.setProperty("--src", `url(${f.file})`); el.style.setProperty("--ar", `${f.w} / ${f.h}`); };
+  const price = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+
+  masked(document.getElementById("logo"), pick("logo-v2", 2));
+  masked(document.getElementById("loop"), pick("strokes", 6));
+
+  const pieces = [
+    { n: 14, title: "Jarra blanca", price: 12000, doodle: 1, stamp: 1, tape: 1, tilt: -1.2, tapeTilt: -4, stampTilt: -8 },
+    { n: 7, title: "Taza celeste", price: 8500, doodle: 2, stamp: 3, tape: 4, tilt: 0.8, tapeTilt: 2, stampTilt: 5 },
+    { n: 23, title: "Ensaladera grande", price: 15000, doodle: 3, stamp: 5, tape: 2, tilt: -0.5, tapeTilt: -1, stampTilt: -3 },
+    { n: 9, title: "Florero alto", price: 11000, doodle: 4, stamp: 6, tape: 5, tilt: 1, tapeTilt: 3, stampTilt: 7 },
+  ];
+  const grid = document.getElementById("pieces");
+  for (const p of pieces) {
+    const fig = document.createElement("figure");
+    fig.className = "piece";
+    fig.innerHTML = `
+      <div class="photo-wrap">
+        <img class="tape" alt="" src="${pick("tape", p.tape).file}">
+        <div class="photo" style="--tilt:${p.tilt}deg"><span class="ink doodle"></span></div>
+        <div class="stamp" style="--stamp-tilt:${p.stampTilt}deg"><span class="clay ring"></span><b><span class="sr">Pieza número </span>${p.n}</b></div>
+      </div>
+      <figcaption><span class="title">${p.title}</span><span class="price">${price.format(p.price)}</span></figcaption>`;
+    masked(fig.querySelector(".doodle"), pick("doodles", p.doodle));
+    masked(fig.querySelector(".ring"), pick("stamps", p.stamp));
+    grid.append(fig);
+  }
+
+  const catalog = (id, sheets, kind) => {
+    const box = document.getElementById(id);
+    for (const sheet of sheets)
+      for (const f of files(sheet)) {
+        const item = document.createElement("div");
+        item.className = "item";
+        const name = f.file.split("/").pop().replace(".webp", "");
+        if (kind === "img") item.innerHTML = `<img class="art" alt="" src="${f.file}"><code>${name}</code>`;
+        else { item.innerHTML = `<span class="${kind} art"></span><code>${name}</code>`; masked(item.querySelector(".art"), f); }
+        box.append(item);
+      }
+  };
+  catalog("logos", Object.keys(manifest).filter((k) => k.startsWith("logo")), "ink");
+  catalog("stamps", ["stamps"], "clay");
+  catalog("doodles", ["doodles"], "ink");
+  catalog("strokes", ["strokes"], "ink");
+  catalog("tape", ["tape"], "img");
+</script>
+</body>
+</html>

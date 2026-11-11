@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lamina",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "assets/scripts/serve.mjs"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3000
+    }
+  ]
+}

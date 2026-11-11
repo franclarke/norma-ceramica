@@ -1,0 +1,334 @@
+/* ---------- Composición: la pared ---------- */
+.wall {
+  --gutter: clamp(16px, 4.5vw, 56px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.intro {
+  padding: clamp(28px, 6vw, 56px) var(--gutter) 8px;
+}
+
+.introInner {
+  display: grid;
+  gap: 22px;
+  max-width: 34rem;
+}
+
+.logo {
+  margin: 0;
+  line-height: 0;
+}
+
+.logoMark {
+  width: min(78vw, 360px);
+  aspect-ratio: 1024 / 365;
+  color: var(--glaze-white);
+  margin-left: -6px;
+}
+
+.hello {
+  margin: 0;
+  font-size: var(--step-1);
+  line-height: 1.35;
+  font-weight: 400;
+  text-wrap: pretty;
+}
+
+.updated {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--glaze-soft);
+}
+
+/* ---------- ¿Te gustó alguna? ---------- */
+.contact {
+  display: grid;
+  gap: 4px;
+  padding: 20px 0 6px;
+  border-top: 2px solid var(--glaze-line);
+}
+
+.contactAsk {
+  margin: 0;
+  font-size: var(--step-1);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.contactText {
+  margin: 0;
+  font-size: var(--step-0);
+  line-height: 1.55;
+  color: var(--glaze-soft);
+  text-wrap: pretty;
+}
+
+.phone {
+  position: relative;
+  display: inline-block;
+  font-size: var(--step-1);
+  font-weight: 800;
+  color: var(--glaze-white);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  padding-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.phoneStroke {
+  position: absolute;
+  left: -4%;
+  right: -6%;
+  bottom: -6px;
+  height: 14px;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  color: var(--glaze-white);
+  opacity: 0.92;
+}
+
+/* ---------- Las tablillas ---------- */
+.main {
+  padding: 28px var(--gutter) 40px;
+  min-width: 0;
+}
+
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 18px 0 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(40px, 6vw, 56px) clamp(24px, 3vw, 40px);
+}
+
+.tiles {
+  scroll-margin-top: 8px;
+}
+
+.tile {
+  container-type: inline-size;
+  rotate: var(--tilt);
+  transform-origin: 50% 1.5%;
+}
+
+/* La firma: al tocarla o pasarle el mouse, la tablilla se hamaca sobre su clavo. */
+@media (hover: hover) {
+  .tile:hover {
+    animation: swing 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+.tile:active,
+.tile:focus-within {
+  animation: swing 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes swing {
+  0% { rotate: var(--tilt); }
+  14% { rotate: calc(var(--tilt) + 3.2deg); }
+  32% { rotate: calc(var(--tilt) - 2.2deg); }
+  50% { rotate: calc(var(--tilt) + 1.3deg); }
+  68% { rotate: calc(var(--tilt) - 0.7deg); }
+  84% { rotate: calc(var(--tilt) + 0.3deg); }
+  100% { rotate: var(--tilt); }
+}
+
+.slab {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  background: var(--slab) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 14px 14px rgb(2 6 40 / 0.55)) drop-shadow(0 2px 3px rgb(2 6 40 / 0.45));
+}
+
+/* La foto, embutida en el esmalte como una ventanita. */
+.window {
+  position: absolute;
+  left: 9.5%;
+  right: 9.5%;
+  top: 10.5%;
+  bottom: 33%;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e9e4dc;
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.18);
+}
+
+.window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 3px 8px rgb(20 10 0 / 0.45), inset 0 -1px 2px rgb(255 255 255 / 0.25);
+  pointer-events: none;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* La franja de barro crudo: número grabado y, al lado, nombre y precio. */
+.label {
+  position: absolute;
+  left: 6.5%;
+  right: 6%;
+  bottom: 4.5%;
+  height: 24.5%;
+  display: flex;
+  align-items: center;
+  gap: 4.5cqw;
+  color: var(--clay-ink);
+}
+
+.number {
+  flex: none;
+  min-width: 2ch;
+  text-align: center;
+  font-size: clamp(2.6rem, 15cqw, 4.4rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--clay-groove);
+  text-shadow: 0 1.5px 0 rgb(255 240 215 / 0.6), 0 -1px 1px rgb(40 20 5 / 0.45);
+}
+
+.groove {
+  flex: none;
+  align-self: stretch;
+  margin: 12% 0;
+  width: 3px;
+  border-radius: 2px;
+  background: rgb(74 44 23 / 0.45);
+  box-shadow: 1px 0 0 rgb(255 240 215 / 0.55);
+}
+
+.text {
+  display: grid;
+  gap: 0.15em;
+  min-width: 0;
+}
+
+.title {
+  font-size: clamp(1.2rem, 6.4cqw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.price {
+  font-size: clamp(1.4rem, 7.8cqw, 2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  max-width: 30rem;
+  font-size: var(--step-1);
+  line-height: 1.4;
+}
+
+/* ---------- El dorso: la lista en texto llano ---------- */
+.back {
+  margin-top: clamp(56px, 9vw, 96px);
+  max-width: 40rem;
+  display: grid;
+  gap: 18px;
+}
+
+.backTitle {
+  margin: 0;
+  font-size: var(--step-1);
+  font-weight: 800;
+}
+
+.list {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--step-0);
+  font-variant-numeric: tabular-nums;
+}
+
+.list th {
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--glaze-soft);
+  padding: 0 0 8px;
+  border-bottom: 2px solid var(--glaze-line);
+}
+
+.list td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--glaze-line);
+  vertical-align: top;
+}
+
+.list td:first-child,
+.list th:first-child {
+  width: 3.2ch;
+  font-weight: 800;
+}
+
+.list td:last-child,
+.list th:last-child {
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 700;
+  padding-left: 12px;
+}
+
+.footer {
+  margin-top: 56px;
+  font-size: 1rem;
+  color: var(--glaze-soft);
+  max-width: 40rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+/* ---------- Tamaños ---------- */
+@media (min-width: 640px) {
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .wall:not([data-compact]) {
+    grid-template-columns: clamp(360px, 31vw, 470px) minmax(0, 1fr);
+  }
+
+  .wall:not([data-compact]) .intro {
+    padding-top: 56px;
+    padding-right: 0;
+    min-width: 0;
+  }
+
+  .wall:not([data-compact]) .logoMark {
+    width: min(100%, 340px);
+  }
+
+  .wall:not([data-compact]) .introInner {
+    position: sticky;
+    top: 48px;
+  }
+
+  .wall:not([data-compact]) .main {
+    padding-top: 64px;
+    padding-left: clamp(32px, 4vw, 64px);
+  }
+}
+
+@media (min-width: 1360px) {
+  .wall:not([data-compact]) .tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

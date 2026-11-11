@@ -1,0 +1,29 @@
+{
+  "tiles": [
+    {
+      "name": "tile-celadon",
+      "width": 1152,
+      "height": 1105
+    },
+    {
+      "name": "tile-ironred",
+      "width": 1136,
+      "height": 1129
+    },
+    {
+      "name": "tile-shino",
+      "width": 1189,
+      "height": 1139
+    },
+    {
+      "name": "tile-ash",
+      "width": 1185,
+      "height": 1154
+    }
+  ],
+  "glazeDominant": {
+    "r": 8,
+    "g": 8,
+    "b": 104
+  }
+}

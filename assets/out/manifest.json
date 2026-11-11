@@ -1,0 +1,215 @@
+{
+  "doodles": {
+    "mode": "ink",
+    "files": [
+      {
+        "file": "out/doodles/doodles-1.webp",
+        "w": 348,
+        "h": 376
+      },
+      {
+        "file": "out/doodles/doodles-2.webp",
+        "w": 292,
+        "h": 284
+      },
+      {
+        "file": "out/doodles/doodles-3.webp",
+        "w": 396,
+        "h": 252
+      },
+      {
+        "file": "out/doodles/doodles-4.webp",
+        "w": 208,
+        "h": 408
+      },
+      {
+        "file": "out/doodles/doodles-5.webp",
+        "w": 272,
+        "h": 412
+      },
+      {
+        "file": "out/doodles/doodles-6.webp",
+        "w": 380,
+        "h": 348
+      },
+      {
+        "file": "out/doodles/doodles-7.webp",
+        "w": 292,
+        "h": 420
+      },
+      {
+        "file": "out/doodles/doodles-8.webp",
+        "w": 344,
+        "h": 340
+      }
+    ]
+  },
+  "logo-v2": {
+    "mode": "ink",
+    "files": [
+      {
+        "file": "out/logo-v2/logo-v2-1.webp",
+        "w": 1024,
+        "h": 291
+      },
+      {
+        "file": "out/logo-v2/logo-v2-2.webp",
+        "w": 1024,
+        "h": 365
+      },
+      {
+        "file": "out/logo-v2/logo-v2-3.webp",
+        "w": 1024,
+        "h": 230
+      }
+    ]
+  },
+  "logo": {
+    "mode": "ink",
+    "files": [
+      {
+        "file": "out/logo/logo-1.webp",
+        "w": 1024,
+        "h": 330
+      },
+      {
+        "file": "out/logo/logo-2.webp",
+        "w": 1024,
+        "h": 329
+      },
+      {
+        "file": "out/logo/logo-3.webp",
+        "w": 1024,
+        "h": 332
+      }
+    ]
+  },
+  "paper": {
+    "mode": "texture",
+    "files": [
+      {
+        "file": "out/paper/paper.webp"
+      }
+    ]
+  },
+  "stamps": {
+    "mode": "ink",
+    "files": [
+      {
+        "file": "out/stamps/stamps-1.webp",
+        "w": 460,
+        "h": 464
+      },
+      {
+        "file": "out/stamps/stamps-2.webp",
+        "w": 464,
+        "h": 460
+      },
+      {
+        "file": "out/stamps/stamps-3.webp",
+        "w": 464,
+        "h": 464
+      },
+      {
+        "file": "out/stamps/stamps-4.webp",
+        "w": 492,
+        "h": 408
+      },
+      {
+        "file": "out/stamps/stamps-5.webp",
+        "w": 456,
+        "h": 448
+      },
+      {
+        "file": "out/stamps/stamps-6.webp",
+        "w": 456,
+        "h": 460
+      }
+    ]
+  },
+  "strokes": {
+    "mode": "ink",
+    "files": [
+      {
+        "file": "out/strokes/strokes-1.webp",
+        "w": 704,
+        "h": 64
+      },
+      {
+        "file": "out/strokes/strokes-2.webp",
+        "w": 252,
+        "h": 324
+      },
+      {
+        "file": "out/strokes/strokes-3.webp",
+        "w": 680,
+        "h": 76
+      },
+      {
+        "file": "out/strokes/strokes-4.webp",
+        "w": 460,
+        "h": 252
+      },
+      {
+        "file": "out/strokes/strokes-5.webp",
+        "w": 356,
+        "h": 80
+      },
+      {
+        "file": "out/strokes/strokes-6.webp",
+        "w": 536,
+        "h": 296
+      },
+      {
+        "file": "out/strokes/strokes-7.webp",
+        "w": 376,
+        "h": 480
+      },
+      {
+        "file": "out/strokes/strokes-8.webp",
+        "w": 392,
+        "h": 480
+      },
+      {
+        "file": "out/strokes/strokes-9.webp",
+        "w": 552,
+        "h": 96
+      }
+    ]
+  },
+  "tape": {
+    "mode": "color",
+    "files": [
+      {
+        "file": "out/tape/tape-1.webp",
+        "w": 720,
+        "h": 308
+      },
+      {
+        "file": "out/tape/tape-2.webp",
+        "w": 732,
+        "h": 332
+      },
+      {
+        "file": "out/tape/tape-3.webp",
+        "w": 740,
+        "h": 292
+      },
+      {
+        "file": "out/tape/tape-4.webp",
+        "w": 732,
+        "h": 260
+      },
+      {
+        "file": "out/tape/tape-5.webp",
+        "w": 696,
+        "h": 304
+      },
+      {
+        "file": "out/tape/tape-6.webp",
+        "w": 792,
+        "h": 292
+      }
+    ]
+  }
+}

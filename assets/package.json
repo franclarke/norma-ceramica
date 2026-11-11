@@ -1,0 +1,11 @@
+{
+  "name": "norma-assets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "extract": "node scripts/extract.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}
