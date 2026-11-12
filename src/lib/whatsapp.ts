@@ -5,7 +5,10 @@ import type { OutgoingMessage } from "./types";
 // Cliente mínimo de la WhatsApp Cloud API (Meta). Sin SDK: son tres llamadas HTTP.
 const GRAPH = "https://graph.facebook.com/v23.0";
 
-export const whatsappConfigured = () => Boolean(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID);
+// El ID del número que recibe el mensaje viene en cada webhook (metadata.phone_number_id);
+// WHATSAPP_PHONE_NUMBER_ID es opcional y solo hace falta para mandar sin haber recibido nada.
+export const whatsappConfigured = () => Boolean(process.env.WHATSAPP_TOKEN);
+const senderId = (fromWebhook?: string) => fromWebhook ?? process.env.WHATSAPP_PHONE_NUMBER_ID;
 
 const auth = () => ({ Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}` });
 
@@ -54,9 +57,9 @@ export function toWhatsApp(to: string, m: OutgoingMessage, base: string) {
   };
 }
 
-export async function sendMessages(to: string, messages: OutgoingMessage[], base: string) {
+export async function sendMessages(to: string, messages: OutgoingMessage[], base: string, phoneNumberId?: string) {
   for (const m of messages) {
-    const res = await fetch(`${GRAPH}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+    const res = await fetch(`${GRAPH}/${senderId(phoneNumberId)}/messages`, {
       method: "POST",
       headers: { ...auth(), "Content-Type": "application/json" },
       body: JSON.stringify(toWhatsApp(to, m, base)),
@@ -66,8 +69,8 @@ export async function sendMessages(to: string, messages: OutgoingMessage[], base
 }
 
 /** Marca el mensaje como leído (los dos tildes azules) y muestra "escribiendo…". */
-export async function markRead(messageId: string) {
-  await fetch(`${GRAPH}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+export async function markRead(messageId: string, phoneNumberId?: string) {
+  await fetch(`${GRAPH}/${senderId(phoneNumberId)}/messages`, {
     method: "POST",
     headers: { ...auth(), "Content-Type": "application/json" },
     body: JSON.stringify({ messaging_product: "whatsapp", status: "read", message_id: messageId, typing_indicator: { type: "text" } }),
@@ -75,6 +78,8 @@ export async function markRead(messageId: string) {
 }
 
 export type WebhookMessage = {
+  /** El número del negocio que recibió el mensaje (viene en metadata del webhook). */
+  to?: string;
   from: string;
   id: string;
   type: string;
@@ -86,8 +91,10 @@ export type WebhookMessage = {
 };
 
 export function extractMessages(payload: unknown): WebhookMessage[] {
+  type Value = { metadata?: { phone_number_id?: string }; messages?: WebhookMessage[] };
   const out: WebhookMessage[] = [];
-  const entries = (payload as { entry?: { changes?: { value?: { messages?: WebhookMessage[] } }[] }[] })?.entry ?? [];
-  for (const e of entries) for (const c of e.changes ?? []) for (const m of c.value?.messages ?? []) out.push(m);
+  const entries = (payload as { entry?: { changes?: { value?: Value }[] }[] })?.entry ?? [];
+  for (const e of entries)
+    for (const c of e.changes ?? []) for (const m of c.value?.messages ?? []) out.push({ ...m, to: c.value?.metadata?.phone_number_id });
   return out;
 }

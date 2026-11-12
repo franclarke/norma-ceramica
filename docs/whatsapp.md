@@ -19,7 +19,7 @@ En https://business.facebook.com/latest/settings → **System users** → creá 
 | Variable | Valor |
 |---|---|
 | `WHATSAPP_TOKEN` | el token del paso 2 |
-| `WHATSAPP_PHONE_NUMBER_ID` | el Phone number ID |
+| `WHATSAPP_PHONE_NUMBER_ID` | opcional: el bot toma el ID del número de cada mensaje que recibe |
 | `WHATSAPP_APP_SECRET` | App settings → Basic → App secret (para verificar la firma) |
 | `WHATSAPP_VERIFY_TOKEN` | cualquier texto secreto que elijas |
 | `NORMA_WHATSAPP` | el número de Norma en formato internacional sin `+`, ej. `5491123456789` (puede ser una lista separada por comas) |

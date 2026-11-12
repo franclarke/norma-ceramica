@@ -47,20 +47,21 @@ async function handle(m: WebhookMessage) {
       m.from,
       [{ kind: "text", text: `Hola. Este número es el ayudante con el que Norma arma su página, así que acá no te va a leer nadie.\n\nSi te gustó alguna pieza, escribile a ella al ${store.contactPhone} y contale cuál. ¡Gracias!` }],
       base,
+      m.to,
     );
     return;
   }
 
-  await markRead(m.id);
+  await markRead(m.id, m.to);
   const incoming = await toIncoming(m);
   if (!incoming) {
-    await sendMessages(m.from, [{ kind: "text", text: "Eso no lo sé abrir todavía. Escribime, mandame un audio o una foto, porfa." }], base);
+    await sendMessages(m.from, [{ kind: "text", text: "Eso no lo sé abrir todavía. Escribime, mandame un audio o una foto, porfa." }], base, m.to);
     return;
   }
   const { replies, duplicate, changed } = await runTurn(NORMA, incoming, { messageId: m.id });
   if (duplicate) return;
   if (changed) revalidateTag(storeTag(NORMA), { expire: 0 });
-  await sendMessages(m.from, replies, base);
+  await sendMessages(m.from, replies, base, m.to);
 }
 
 async function toIncoming(m: WebhookMessage): Promise<ChannelMessage | null> {
