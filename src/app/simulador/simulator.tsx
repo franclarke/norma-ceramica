@@ -394,6 +394,11 @@ export function Simulator({
             src={`/tienda/${storeId}?compacta${pageVersion ? "#piezas" : ""}`}
             title="La página de Norma"
             className={s.frame}
+            // Después de un cambio, la página abre en las piezas. El ancla sola a veces no alcanza
+            // (el contenido llega por streaming), así que se asegura al terminar de cargar.
+            onLoad={(e) => {
+              if (pageVersion) e.currentTarget.contentDocument?.getElementById("piezas")?.scrollIntoView({ block: "start" });
+            }}
           />
         </div>
         <a className={s.open} href={`/tienda/${storeId}`} target="_blank" rel="noreferrer">
