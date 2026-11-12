@@ -131,7 +131,7 @@ export function StoreView({ store, compact = false, featured }: { store: PublicS
             <p>Esta es una tienda de prueba del simulador. Las fotos son de Unsplash y Pexels; los nombres y precios, de ejemplo.</p>
           ) : (
             <p>
-              Fotos de ejemplo de Unsplash y Pexels. ¿Sos Norma, o querés ver cómo se actualiza esta página?{" "}
+              ¿Sos Norma, o querés ver cómo se actualiza esta página?{" "}
               {/* Sin prefetch: un comprador casi nunca va a tocar estos links, y su celular no baja nada de más. */}
               <Link href="/simulador" prefetch={false}>
                 Probalo acá
