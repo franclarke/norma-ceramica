@@ -136,6 +136,9 @@ const redisUrl = () => process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_
 const redisToken = () => process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
 let redis: Redis | null = null;
 const getRedis = () => (redis ??= new Redis({ url: redisUrl()!, token: redisToken()! }));
+const redisEnabled = () => Boolean(redisUrl() && redisToken() && process.env.STORAGE !== "fs");
+/** El mismo cliente para todo lo que necesita Redis (candados, cupos). null si no está conectado. */
+export const sharedRedis = () => (redisEnabled() ? getRedis() : null);
 const DEMO_TTL = 60 * 60 * 24 * 2;
 
 function withRedis(files: Storage): Storage {

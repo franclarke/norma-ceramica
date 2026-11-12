@@ -40,13 +40,20 @@ export async function downloadMedia(mediaId: string): Promise<Buffer> {
 const absolute = (url: string, base: string) => (url.startsWith("http") ? url : new URL(url, base).toString());
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
-/** Traduce una respuesta del bot al formato de la Cloud API. */
+/**
+ * WhatsApp solo muestra fotos JPEG o PNG, y las de la página son WebP (pesan la mitad):
+ * las que van al chat salen convertidas por /api/jpg. La tablilla ya es PNG.
+ */
+export const photoLink = (url: string, base: string) =>
+  url.startsWith("/api/tablilla/") ? absolute(url, base) : new URL(`/api/jpg/${Buffer.from(url).toString("base64url")}.jpg`, base).toString();
+
 /**
  * Los celulares argentinos llegan en el webhook como 549 + área + número, pero la Cloud API
  * los reconoce (y los autoriza en la lista de prueba) sin el 9: 54 + área + número.
  */
 export const toRecipient = (waId: string) => (/^549\d{10}$/.test(waId) ? `54${waId.slice(3)}` : waId);
 
+/** Traduce una respuesta del bot al formato de la Cloud API. */
 export function toWhatsApp(rawTo: string, m: OutgoingMessage, base: string) {
   const to = toRecipient(rawTo);
   const buttons = m.buttons?.slice(0, 3).map((b) => ({ type: "reply", reply: { id: b.id, title: clip(b.title, 20) } }));
@@ -54,7 +61,7 @@ export function toWhatsApp(rawTo: string, m: OutgoingMessage, base: string) {
     if (!buttons?.length) return { messaging_product: "whatsapp", to, type: "text", text: { body: m.text, preview_url: true } };
     return { messaging_product: "whatsapp", to, type: "interactive", interactive: { type: "button", body: { text: clip(m.text, 1024) }, action: { buttons } } };
   }
-  const link = absolute(m.photo.url, base);
+  const link = photoLink(m.photo.url, base);
   if (!buttons?.length) return { messaging_product: "whatsapp", to, type: "image", image: { link, caption: clip(m.caption, 1024) } };
   return {
     messaging_product: "whatsapp",
@@ -97,6 +104,18 @@ export type WebhookMessage = {
   interactive?: { type: string; button_reply?: { id: string; title: string } };
   button?: { text: string; payload: string };
 };
+
+/** Mensajes nuestros que WhatsApp no pudo entregar (por ejemplo, una foto que no le gustó). */
+export function extractFailures(payload: unknown): string[] {
+  type Status = { status?: string; errors?: { code?: number; title?: string; error_data?: { details?: string } }[] };
+  const out: string[] = [];
+  const entries = (payload as { entry?: { changes?: { value?: { statuses?: Status[] } }[] }[] })?.entry ?? [];
+  for (const e of entries)
+    for (const c of e.changes ?? [])
+      for (const st of c.value?.statuses ?? [])
+        if (st.status === "failed") for (const err of st.errors ?? []) out.push(`${err.code ?? "?"} ${err.title ?? ""} ${err.error_data?.details ?? ""}`.trim());
+  return out;
+}
 
 export function extractMessages(payload: unknown): WebhookMessage[] {
   type Value = { metadata?: { phone_number_id?: string }; messages?: WebhookMessage[] };

@@ -34,20 +34,40 @@ export type Draft = {
   price?: number;
   /** Nombre que propuso la IA mirando la foto (Norma lo acepta o escribe otro). */
   suggestedTitle?: string;
-  /** Si está editando una pieza existente. */
-  number?: number;
+  /** La foto salió oscura: antes de seguir le preguntamos si manda otra. */
+  dark?: boolean;
+};
+
+/** Un cambio pedido sobre una pieza que todavía no sabemos cuál es, o a cuánto. */
+export type Change = {
+  kind: "price" | "rename" | "edit";
+  /** null: quiere cambiar el precio pero no dijo a cuánto. */
+  price?: number | null;
+  /** "bajale 2000" es -2000. */
+  delta?: number;
+  /** "bajale un 10%" es -10. */
+  percent?: number;
+  title?: string | null;
+  photo?: boolean;
 };
 
 export type ConversationStep =
   | { step: "idle" }
+  /** Le acabamos de mostrar una pieza: lo que diga ahora ("ahora sale 9000") es sobre esa. */
+  | { step: "piece"; number: number }
   | { step: "add:photo"; draft?: Draft }
   | { step: "add:title"; draft: Draft }
   | { step: "add:price"; draft: Draft }
   | { step: "add:confirm"; draft: Draft }
   | { step: "add:dark-photo"; draft: Draft }
-  | { step: "sold:number" }
-  | { step: "sold:confirm"; number: number }
-  | { step: "edit:number" }
+  /**
+   * options: las candidatas cuando lo que dijo ("la taza") coincide con varias.
+   * missed: ya le preguntamos una vez y no entendimos; a la segunda, soltamos.
+   */
+  | { step: "sold:number"; why?: "sold" | "broken"; options?: number[]; missed?: boolean }
+  | { step: "sold:confirm"; numbers: number[]; why?: "sold" | "broken" }
+  | { step: "restore:number"; options?: number[]; missed?: boolean }
+  | { step: "edit:number"; change?: Change; options?: number[]; missed?: boolean }
   | { step: "edit:what"; number: number }
   | { step: "edit:photo"; number: number }
   | { step: "edit:title"; number: number }
@@ -81,6 +101,8 @@ export type Store = {
   updatedAt: string;
   conversation: ConversationStep;
   undo: UndoEntry[];
+  /** Fotos que mandó juntas y esperan su turno: se cargan de a una. */
+  queue?: Draft[];
   /** Solo en las tiendas del simulador: la conversación para dibujar el chat. */
   chat?: ChatEntry[];
   demo?: boolean;

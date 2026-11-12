@@ -5,7 +5,7 @@ import { processPhoto } from "@/lib/images";
 import { createHash } from "node:crypto";
 import { loadStore, NORMA, storeExists, storeTag } from "@/lib/store";
 import type { OutgoingMessage } from "@/lib/types";
-import { downloadMedia, extractMessages, isOwner, markRead, sendMessages, verifySignature, type WebhookMessage } from "@/lib/whatsapp";
+import { downloadMedia, extractFailures, extractMessages, isOwner, markRead, sendMessages, verifySignature, type WebhookMessage } from "@/lib/whatsapp";
 
 // Verificación del webhook que hace Meta al configurarlo.
 export async function GET(req: Request) {
@@ -28,6 +28,7 @@ export async function POST(req: Request) {
     return new Response("Bad JSON", { status: 400 });
   }
 
+  for (const failure of extractFailures(payload)) console.error("whatsapp no entregó:", failure);
   const messages = extractMessages(payload);
   after(async () => {
     for (const m of messages) {
@@ -91,7 +92,7 @@ const demoWelcome = (storeId: string, base: string): OutgoingMessage => ({
     "Para que lo pruebes, te armé una tienda de prueba solo para vos (la de Norma no se toca):",
     `${base}/tienda/${storeId}`,
     "",
-    "Hacé de cuenta que sos Norma: mandame una foto de algo con el nombre y el precio abajo, escribime «vendí la 14» o mandame un audio.",
+    "Hacé de cuenta que sos Norma: mandame una foto de algo, escribime «vendí la 14» o decime en un audio «la tetera ahora sale veinte mil».",
   ].join("\n"),
 });
 

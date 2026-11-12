@@ -9,7 +9,7 @@ import s from "./simulador.module.css";
 type Sample = { id: string; label: string; photo: Photo; dark?: boolean };
 type Pending = { id: string; message: IncomingMessage };
 
-const TRIES = ["hola", "vendí la 14", "la 23 ahora sale 13000", "volví a tener la 14", "deshacer", "lista"];
+const TRIES = ["hola", "vendí la jarrita blanca", "bajale 2000 a la tetera", "se me rompió una taza", "deshacer", "lista"];
 
 const formatSeconds = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
 
@@ -209,8 +209,8 @@ export function Simulator({
                 <p className={s.bubbleText}>
                   {"¡Hola, Norma! Escribime como a cualquier persona:\n\n"}
                   {"• Mandame una foto para agregar una pieza (tocá la cámara de abajo).\n"}
-                  {"• «vendí la 14» para sacar una que vendiste.\n"}
-                  {"• «la 23 ahora sale 13000» para cambiar un precio.\n"}
+                  {"• «vendí la 14», o «vendí la jarrita blanca», para sacar una que vendiste.\n"}
+                  {"• «la 23 ahora sale 19000» para cambiar un precio.\n"}
                   {"• «deshacer» si te equivocaste."}
                   {voice && "\n\nO mandame un audio con tus palabras, como «la jarrita blanca ya la vendí». Tocá el micrófono."}
                 </p>

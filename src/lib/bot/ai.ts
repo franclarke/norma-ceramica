@@ -1,6 +1,7 @@
 import "server-only";
 import { gateway, generateText, Output, transcribe, type LanguageModel } from "ai";
 import { z } from "zod";
+import { sharedRedis } from "../storage";
 import type { Piece } from "../types";
 
 /*
@@ -28,10 +29,9 @@ const FAST = (tag: string) => ({
 const configured = () =>
   process.env.AI !== "off" && Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN || process.env.VERCEL);
 
-// ¿Hay crédito en el AI Gateway? Se consulta cada 10 minutos por instancia: así la IA se prende
-// sola cuando la cuenta tiene saldo, y mientras tanto el bot no pierde tiempo en llamadas que fallan.
-// Tope de gasto: la cuenta tiene USD 5 de crédito gratis y no se gasta más que eso.
-// La IA se apaga sola cuando quedan menos de USD 1 de saldo.
+// Tope de gasto: la cuenta tiene USD 5 de crédito gratis y no se gasta más que eso. El saldo del
+// AI Gateway se consulta cada 2 minutos por instancia y la IA se apaga sola cuando queda menos de
+// USD 1; mientras tanto el bot sigue andando sin ella.
 const MIN_BALANCE = Number(process.env.AI_MIN_BALANCE ?? 1);
 let health: { ok: boolean; at: number } | null = null;
 export async function aiAvailable(): Promise<boolean> {
@@ -58,17 +58,18 @@ export async function takeAiQuota(storeId: string): Promise<boolean> {
   const day = new Date().toISOString().slice(0, 10);
   const keys = [`ai:${day}:all`, `ai:${day}:${storeId}`];
   const limits = [LIMITS.global, storeId === "norma" ? LIMITS.global : LIMITS.perStore];
-  const url = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
+  const redis = sharedRedis();
   let counts: number[];
-  if (url && token) {
-    const { Redis } = await import("@upstash/redis");
-    const redis = new Redis({ url, token });
+  try {
+    if (!redis) throw new Error("sin redis");
     const p = redis.pipeline();
-    for (const k of keys) p.incr(k), p.expire(k, 60 * 60 * 48);
+    for (const k of keys) {
+      p.incr(k);
+      p.expire(k, 60 * 60 * 48);
+    }
     const res = (await p.exec()) as number[];
     counts = [res[0], res[2]];
-  } else {
+  } catch {
     counts = keys.map((k) => {
       const n = (memory.get(k) ?? 0) + 1;
       memory.set(k, n);
@@ -93,7 +94,7 @@ export async function transcribeVoice(audio: Uint8Array): Promise<string | null>
   }
 }
 
-const ACTIONS = ["sold", "restore", "price", "rename", "edit", "add", "list", "link", "undo", "help", "greeting", "cancel", "yes", "no", "unknown"] as const;
+const ACTIONS = ["sold", "restore", "price", "rename", "edit", "add", "list", "link", "undo", "help", "greeting", "thanks", "cancel", "yes", "no", "unknown"] as const;
 
 const IntentSchema = z.object({
   action: z.enum(ACTIONS),
@@ -118,21 +119,24 @@ Acciones:
 - undo: se equivocó y quiere volver atrás.
 - help: no sabe qué hacer.
 - greeting: solo saluda.
+- thanks: solo agradece o se despide.
 - cancel: quiere dejar lo que estaba haciendo.
 - yes / no: contesta que sí o que no a una pregunta.
 - unknown: cualquier otra cosa, o si no estás seguro.
 
+Si el bot le acaba de preguntar algo, leé el mensaje como la respuesta a esa pregunta.
 Para identificar la pieza usá el número si lo dice, o si no el nombre comparándolo con la lista ("la jarrita blanca" es la de nombre parecido).
 Si dos piezas encajan igual de bien, o ninguna, number = null. Nunca inventes números que no estén en la lista.`;
 
-export async function interpret(text: string, pieces: Piece[], sold: Piece[], model?: LanguageModel): Promise<AiIntent | null> {
+export async function interpret(text: string, pieces: Piece[], sold: Piece[], model?: LanguageModel, asking?: string): Promise<AiIntent | null> {
   if (!model && !(await aiAvailable())) return null;
   const list = (ps: Piece[]) => ps.map((p) => `${p.number} · ${p.title} · $${p.price}`).join("\n") || "(ninguna)";
+  const question = asking ? `El bot le acaba de preguntar: «${asking}»\n\n` : "";
   try {
     const { output } = await generateText({
       model: model ?? gateway(MODELS.text),
       system: SYSTEM,
-      prompt: `Piezas en la página:\n${list(pieces)}\n\nPiezas que sacó (vendidas):\n${list(sold)}\n\nMensaje de Norma: «${text}»`,
+      prompt: `Piezas en la página:\n${list(pieces)}\n\nPiezas que sacó (vendidas):\n${list(sold)}\n\n${question}Mensaje de Norma: «${text}»`,
       output: Output.object({ schema: IntentSchema }),
       providerOptions: FAST("interpret"),
       abortSignal: AbortSignal.timeout(TIMEOUT_MS),
@@ -173,6 +177,8 @@ export function toCommand(i: AiIntent): string | null {
       return "ayuda";
     case "greeting":
       return "hola";
+    case "thanks":
+      return "gracias";
     case "cancel":
       return "cancelar";
     case "yes":

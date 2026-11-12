@@ -1,9 +1,10 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { respond } from "./engine";
-import { detectIntent } from "./parse";
-import { interpret, suggestTitle, takeAiQuota, toCommand, transcribeVoice } from "./ai";
+import { aiAvailable, interpret, suggestTitle, takeAiQuota, toCommand, transcribeVoice } from "./ai";
 import { loadStore, saveStore } from "../store";
-import type { ChatEntry, IncomingMessage, OutgoingMessage, Store } from "../types";
+import { sharedRedis } from "../storage";
+import type { ChatEntry, ConversationStep, IncomingMessage, OutgoingMessage, Store } from "../types";
 
 export const siteUrl = () =>
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -12,39 +13,49 @@ export const siteUrl = () =>
 /** Lo que llega de un canal antes de pasar por el bot: puede ser un audio. */
 export type ChannelMessage = IncomingMessage | { kind: "audio"; audio: Uint8Array };
 
-const CONFIRM_STEPS = new Set(["add:confirm", "sold:confirm", "edit:confirm", "restore:confirm", "add:dark-photo"]);
+type TurnResult = { store: Store; replies: OutgoingMessage[]; duplicate: boolean; changed: boolean };
 
-/** Un turno de conversación: carga la tienda, entiende el mensaje, responde y guarda. Igual para WhatsApp y el simulador. */
-export async function runTurn(storeId: string, raw: ChannelMessage, opts: { messageId?: string } = {}) {
+/**
+ * Un turno de conversación: carga la tienda, entiende el mensaje, responde y guarda.
+ * Igual para WhatsApp y el simulador. Los turnos de una misma tienda van de a uno: si Norma
+ * manda tres fotos juntas, ninguna pisa a la otra.
+ */
+export function runTurn(storeId: string, raw: ChannelMessage, opts: { messageId?: string } = {}): Promise<TurnResult> {
+  return oneAtATime(storeId, () => turn(storeId, raw, opts));
+}
+
+async function turn(storeId: string, raw: ChannelMessage, opts: { messageId?: string }): Promise<TurnResult> {
   const store = await loadStore(storeId);
-  if (opts.messageId && store.processed?.includes(opts.messageId)) return { store, replies: [] as OutgoingMessage[], duplicate: true, changed: false };
+  if (opts.messageId && store.processed?.includes(opts.messageId)) return { store, replies: [], duplicate: true, changed: false };
 
   const incoming = await understand(store, raw);
   const now = new Date().toISOString();
-  const pageUrl = store.demo ? `${siteUrl()}/tienda/${store.id}` : siteUrl();
+  const ctx = { now, siteUrl: store.demo ? `${siteUrl()}/tienda/${store.id}` : siteUrl() };
 
   let replies: OutgoingMessage[];
   let next: Store;
   if (!incoming) {
     next = structuredClone(store);
-    replies = [{ kind: "text", text: "No te pude escuchar bien. ¿Me lo escribís, o me mandás el audio de nuevo?" }];
+    const sorry = (await aiAvailable()) ? "No te pude escuchar bien. ¿Me lo mandás de nuevo, o me lo escribís?" : "Hoy no estoy pudiendo escuchar audios. ¿Me lo escribís, porfa?";
+    replies = [{ kind: "text", text: sorry }];
   } else {
-    // Lo que dijo Norma queda tal cual en el chat; al bot le llega la versión que entiende.
-    const result = respond(store, await withAi(store, incoming), { now, siteUrl: pageUrl });
+    let result = respond(store, incoming, ctx);
+    // El bot entiende solo casi todo. Cuando no, la IA traduce lo que dijo Norma a una frase que
+    // el bot sí entiende ("la del pajarito ya no la tengo" → "vendí la 24") y se prueba de nuevo.
+    // Nada cambia en la página sin la confirmación de siempre.
+    if (result.missed && incoming.kind === "text" && (await takeAiQuota(store.id))) {
+      const ai = await interpret(incoming.text, store.pieces, store.sold, undefined, asking(store.conversation));
+      const command = ai ? toCommand(ai) : null;
+      const again = command ? respond(store, { kind: "text", text: command }, ctx) : null;
+      // Si el bot ya sabía qué quería y solo faltaba cuál, la IA sirve si encontró la pieza.
+      if (again && !again.missed && (result.missed === "all" || ai?.number != null)) result = again;
+    }
     next = result.store;
     replies = result.replies;
-    // Así quedó: la tablilla tal cual la ve un comprador, para que Norma no tenga que abrir la página.
-    const piece = result.touched !== undefined ? next.pieces.find((p) => p.number === result.touched) : undefined;
-    if (piece) {
-      replies.push({
-        kind: "image",
-        photo: { url: `/api/tablilla/${next.id}/${piece.number}?v=${Date.parse(piece.updatedAt)}`, width: 1200, height: 630 },
-        caption: next.demo ? "Así quedó en tu página." : `Así quedó en tu página: ${siteUrl()}/${piece.number}`,
-      });
-    }
   }
 
   if (opts.messageId) next.processed = [...(store.processed ?? []), opts.messageId].slice(-50);
+  // Lo que dijo Norma queda tal cual en el chat del simulador.
   if (next.demo && incoming) next.chat = appendChat(next, incoming, replies, now);
   await saveStore(next);
   const changed = next.updatedAt !== store.updatedAt || JSON.stringify(next.pieces) !== JSON.stringify(store.pieces);
@@ -59,7 +70,7 @@ async function understand(store: Store, raw: ChannelMessage): Promise<IncomingMe
   }
   if (raw.kind === "image" && !raw.suggestedTitle) {
     const step = store.conversation.step;
-    const isNewPiece = step === "idle" || step.startsWith("add:");
+    const isNewPiece = step === "idle" || step === "piece" || step.startsWith("add:");
     const caption = raw.caption?.trim() ?? "";
     const captionHasTitle = caption && !/^\s*(la|pieza|n[º°o]?\.?)?\s*\d[\d.,\s]*(mil|lucas?)?\s*$/i.test(caption);
     if (isNewPiece && !captionHasTitle && (await takeAiQuota(store.id))) {
@@ -71,21 +82,30 @@ async function understand(store: Store, raw: ChannelMessage): Promise<IncomingMe
   return raw;
 }
 
-/**
- * Si el bot determinístico no entiende lo que dijo Norma con sus palabras, la IA lo traduce a un
- * comando que sí entiende ("la jarrita blanca ya no la tengo" → "vendí la 14"). Nada se aplica sin
- * pasar por la confirmación de siempre.
- */
-export async function withAi(store: Store, msg: IncomingMessage): Promise<IncomingMessage> {
-  if (msg.kind !== "text") return msg;
-  const step = store.conversation.step;
-  const intent = detectIntent(msg.text).type;
-  const vague = intent === "unknown" || (["sold", "restore", "price", "rename", "edit"].includes(intent) && !/\d/.test(msg.text));
-  const needsAi = (step === "idle" && vague) || (CONFIRM_STEPS.has(step) && !["yes", "no", "cancel", "undo"].includes(intent));
-  if (!needsAi || !(await takeAiQuota(store.id))) return msg;
-  const ai = await interpret(msg.text, store.pieces, store.sold);
-  const command = ai ? toCommand(ai) : null;
-  return command ? { kind: "text", text: command } : msg;
+/** La pregunta que el bot le había hecho, para que la IA entienda a qué contesta Norma. */
+function asking(c: ConversationStep): string | undefined {
+  switch (c.step) {
+    case "add:confirm":
+      return "¿Publico la pieza nueva así como está?";
+    case "add:dark-photo":
+      return "La foto salió oscura. ¿Querés mandar otra? (yes: manda otra; no: usa esta)";
+    case "sold:confirm":
+      return `¿Saco de la página la pieza ${c.numbers.join(" y la ")}?`;
+    case "restore:confirm":
+      return `¿Vuelvo a poner en la página la pieza ${c.number}?`;
+    case "edit:confirm":
+      return `¿Guardo el cambio en la pieza ${c.number}?`;
+    case "edit:what":
+      return `¿Qué le cambio a la pieza ${c.number}?`;
+    case "sold:number":
+      return "¿Cuál es la pieza que vendiste?";
+    case "edit:number":
+      return "¿Cuál es la pieza que querés cambiar?";
+    case "restore:number":
+      return "¿Cuál es la pieza que volviste a tener?";
+    default:
+      return undefined;
+  }
 }
 
 function appendChat(store: Store, incoming: IncomingMessage, replies: OutgoingMessage[], now: string): ChatEntry[] {
@@ -95,4 +115,43 @@ function appendChat(store: Store, incoming: IncomingMessage, replies: OutgoingMe
     ...replies.map((m) => ({ id: id(), from: "bot" as const, at: now, message: m })),
   ];
   return [...(store.chat ?? []), ...entries].slice(-80);
+}
+
+// ---------- De a un turno por tienda ----------
+
+const chains = new Map<string, Promise<unknown>>();
+
+async function oneAtATime<T>(storeId: string, fn: () => Promise<T>): Promise<T> {
+  // En la misma instancia: una cola por tienda. Entre instancias: un candado en Redis.
+  const run = (chains.get(storeId) ?? Promise.resolve()).catch(() => {}).then(() => withLock(storeId, fn));
+  chains.set(storeId, run);
+  try {
+    return await run;
+  } finally {
+    if (chains.get(storeId) === run) chains.delete(storeId);
+  }
+}
+
+const RELEASE = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) end return 0";
+
+async function withLock<T>(storeId: string, fn: () => Promise<T>): Promise<T> {
+  const redis = sharedRedis();
+  if (!redis) return fn();
+  const key = `lock:${storeId}`;
+  const token = randomUUID();
+  let held = false;
+  try {
+    // Espera hasta 20 segundos su turno; si el candado no se libera, sigue igual antes que dejar a Norma sin respuesta.
+    for (let i = 0; i < 100 && !held; i++) {
+      held = (await redis.set(key, token, { nx: true, px: 30_000 })) === "OK";
+      if (!held) await new Promise((r) => setTimeout(r, 200));
+    }
+  } catch (e) {
+    console.error("lock", e);
+  }
+  try {
+    return await fn();
+  } finally {
+    if (held) await redis.eval(RELEASE, [key], [token]).catch(() => {});
+  }
 }
