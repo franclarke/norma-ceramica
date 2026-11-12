@@ -110,7 +110,7 @@ export function StoreView({ store, compact = false, featured }: { store: PublicS
           ) : (
             <p>
               Fotos de ejemplo de Unsplash y Pexels. ¿Sos Norma, o querés ver cómo se actualiza esta página?{" "}
-              <Link href="/simulador">Probalo acá</Link>.
+              <Link href="/simulador">Probalo acá</Link>. <Link href="/privacidad">Privacidad</Link>.
             </p>
           )}
         </footer>
