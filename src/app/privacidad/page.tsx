@@ -55,8 +55,7 @@ export default function Privacidad() {
 
       <h2>Cómo pedir que se borren tus datos</h2>
       <p>
-        Escribile a Norma por WhatsApp, o mandale al ayudante el mensaje «borrar mis datos». Borramos lo que tengamos tuyo dentro de los
-        30 días.
+        Pedíselo a Norma por WhatsApp y borramos lo que tengamos tuyo dentro de los 30 días.
       </p>
     </main>
   );
