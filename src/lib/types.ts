@@ -77,6 +77,8 @@ export type ConversationStep =
 
 /** Para poder deshacer: la foto completa de la tienda antes del cambio. */
 export type UndoEntry = {
+  /** Para que el botón «Me equivoqué» de un mensaje deshaga ese cambio y no otro. */
+  id?: string;
   label: string;
   pieces: Piece[];
   sold: Piece[];

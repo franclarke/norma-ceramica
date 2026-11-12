@@ -453,6 +453,48 @@ describe("en medio de una cosa pide otra", () => {
   });
 });
 
+describe("el botón «Me equivoqué»", () => {
+  const sorryOf = (r: Result): IncomingMessage => {
+    const b = r.replies.flatMap((m) => m.buttons ?? []).find((x) => x.id.startsWith("undo:"));
+    if (!b) throw new Error("no hay botón para arrepentirse");
+    return { kind: "button", ...b };
+  };
+  const later = { ...ctx, now: "2026-11-13T09:00:00.000Z" };
+
+  it("viene después de cada cambio y deshace ese cambio", () => {
+    const sold = talk(shop(), "vendí la 14", YES);
+    expect(said(sold)).not.toMatch(/deshacer/);
+    expect(numbers(talk(sold, sorryOf(sold)))).toContain(14);
+    const priced = talk(shop(), "la 14 ahora sale 9000", YES);
+    expect(price(talk(priced, sorryOf(priced)), 14)).toBe(9500);
+    const added = talk(shop(), { kind: "image", photo, caption: "Bol 2000" }, YES);
+    expect(numbers(talk(added, sorryOf(added)))).not.toContain(25);
+  });
+
+  it("tocado tarde, con otros cambios encima, no deshace otra cosa", () => {
+    const sold = talk(shop(), "vendí la 14", YES);
+    const old = sorryOf(sold);
+    // Al otro día cambia un precio, y recién después toca el botón viejo.
+    let r = respond(sold.store, { kind: "text", text: "la 16 ahora sale 7000" }, later);
+    r = respond(r.store, { kind: "button", ...r.replies.flatMap((m) => m.buttons ?? []).find((b) => b.id.startsWith("ok:"))! }, later);
+    r = respond(r.store, old, later);
+    expect(price(r, 16)).toBe(7000);
+    expect(numbers(r)).not.toContain(14);
+    expect(said(r)).toMatch(/ya quedó atrás/);
+  });
+
+  it("dos veces seguidas no deshace dos cosas", () => {
+    const first = talk(shop(), "vendí la 14", YES);
+    const second = respond(first.store, { kind: "text", text: "vendí la 16" }, later);
+    const done = respond(second.store, { kind: "button", ...second.replies.flatMap((m) => m.buttons ?? []).find((b) => b.id.startsWith("ok:"))! }, later);
+    const sorry = sorryOf(done);
+    const once = respond(done.store, sorry, later);
+    const twice = respond(once.store, sorry, later);
+    expect(numbers(twice)).toContain(16);
+    expect(numbers(twice)).not.toContain(14);
+  });
+});
+
 describe("charla", () => {
   it("agradece sin mandarle el menú", () => {
     const r = talk(shop(), "muchas gracias");

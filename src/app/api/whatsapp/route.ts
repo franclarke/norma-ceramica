@@ -75,7 +75,7 @@ async function handle(m: WebhookMessage) {
     await sendMessages(m.from, [...welcome, { kind: "text", text: "Eso no lo sé abrir todavía. Escribime, mandame un audio o una foto, porfa." }], base, m.to);
     return;
   }
-  const { replies, duplicate, changed } = await runTurn(storeId, incoming, { messageId: m.id });
+  const { replies, duplicate, changed } = await runTurn(storeId, incoming, { messageId: m.id, echoVoice: true });
   if (duplicate) return;
   if (changed && owner) revalidateTag(storeTag(NORMA), { expire: 0 });
   await sendMessages(m.from, [...welcome, ...replies], base, m.to);

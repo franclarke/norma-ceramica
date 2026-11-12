@@ -21,11 +21,14 @@ type TurnResult = { store: Store; replies: OutgoingMessage[]; duplicate: boolean
  * Igual para WhatsApp y el simulador. Los turnos de una misma tienda van de a uno: si Norma
  * manda tres fotos juntas, ninguna pisa a la otra.
  */
-export function runTurn(storeId: string, raw: ChannelMessage, opts: { messageId?: string } = {}): Promise<TurnResult> {
+/** echoVoice: contestar primero qué se entendió de un audio (en WhatsApp; el simulador ya lo muestra en la burbuja). */
+type TurnOptions = { messageId?: string; echoVoice?: boolean };
+
+export function runTurn(storeId: string, raw: ChannelMessage, opts: TurnOptions = {}): Promise<TurnResult> {
   return oneAtATime(storeId, () => turn(storeId, raw, opts));
 }
 
-async function turn(storeId: string, raw: ChannelMessage, opts: { messageId?: string }): Promise<TurnResult> {
+async function turn(storeId: string, raw: ChannelMessage, opts: TurnOptions): Promise<TurnResult> {
   const store = await loadStore(storeId);
   if (opts.messageId && store.processed?.includes(opts.messageId)) return { store, replies: [], duplicate: true, changed: false };
 
@@ -53,6 +56,8 @@ async function turn(storeId: string, raw: ChannelMessage, opts: { messageId?: st
     }
     next = result.store;
     replies = result.replies;
+    // Norma no ve qué entendió el bot de su audio: se lo decimos antes de contestarle.
+    if (opts.echoVoice && incoming.kind === "text" && incoming.voice) replies = [{ kind: "text", text: `Te escuché: «${incoming.text.slice(0, 300)}»` }, ...replies];
   }
 
   if (opts.messageId) next.processed = [...(store.processed ?? []), opts.messageId].slice(-50);

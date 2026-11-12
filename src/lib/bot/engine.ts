@@ -176,6 +176,14 @@ function nextInQueue(t: Turn) {
 function onButton(t: Turn, id: string) {
   const step = t.s.conversation;
   if (id.startsWith("menu:")) return startMenu(t, id);
+  if (id.startsWith("undo:")) {
+    // Con otra cosa a medias, seguimos con esa. Y solo se deshace el cambio de ese mensaje.
+    if (step.step !== "idle" && step.step !== "piece") return reprompt(t);
+    const last = t.s.undo.at(-1);
+    if (last?.id === id.slice(5)) return undo(t);
+    rest(t);
+    return say(t, last ? "Ese cambio ya quedó atrás: después hiciste otros. Si querés deshacer el último, escribime: deshacer" : "Eso ya está deshecho. Tu página está como la dejaste.");
+  }
   if (id === yesId(step)) return confirm(t);
   if (id === "confirm:no" && yesId(step)) return decline(t);
 
@@ -749,12 +757,12 @@ function confirm(t: Turn) {
       if (!d.photo || !d.title || !d.price) return askNext(t, d);
       const number = s.nextNumber;
       const piece: Piece = { number, title: d.title, price: d.price, photo: d.photo, createdAt: ctx.now, updatedAt: ctx.now };
-      pushUndo(s, `agregar la ${number} (${lower(d.title)})`);
+      pushUndo(t, `agregar la ${number} (${lower(d.title)})`);
       s.pieces = sortPieces([...s.pieces, piece]);
       s.nextNumber = number + 1;
       s.updatedAt = ctx.now;
       rest(t);
-      say(t, `¡Listo! «${d.title}» ya está en tu página con el número ${number}.\n\nCuando la vendas, escribime: vendí la ${number}`);
+      say(t, `¡Listo! «${d.title}» ya está en tu página con el número ${number}.\n\nCuando la vendas, escribime: vendí la ${number}`, sorry(t));
       asItIs(t, piece);
       return nextInQueue(t);
     }
@@ -763,24 +771,24 @@ function confirm(t: Turn) {
       rest(t);
       if (!gone.length) return say(t, "Esa pieza ya no estaba en la página.");
       const names = gone.length === 1 ? describe(gone[0]) : gone.map((p) => `la ${p.number}`).join(", ").replace(/, ([^,]*)$/, " y $1");
-      pushUndo(s, `sacar ${names}`);
+      pushUndo(t, `sacar ${names}`);
       s.pieces = s.pieces.filter((p) => !step.numbers.includes(p.number));
       s.sold = [...gone.map((p) => ({ ...p, updatedAt: ctx.now })), ...s.sold.filter((x) => !step.numbers.includes(x.number))];
       s.updatedAt = ctx.now;
       const cheer = step.why === "sold" ? (gone.length === 1 ? " ¡Qué bueno que se vendió!" : " ¡Qué bueno que se vendieron!") : step.why === "broken" ? " Qué lástima." : "";
       const empty = s.pieces.length ? "" : "\n\nTu página quedó sin piezas. Cuando tengas una nueva, mandame la foto.";
-      return say(t, `Listo, saqué ${names} de la página.${cheer}${empty}\n\nSi fue un error, escribime: deshacer`);
+      return say(t, `Listo, saqué ${names} de la página.${cheer}${empty}`, sorry(t));
     }
     case "restore:confirm": {
       const p = s.sold.find((x) => x.number === step.number);
       rest(t);
       if (!p) return say(t, "Esa pieza ya no la tengo guardada.");
       const back = { ...p, updatedAt: ctx.now };
-      pushUndo(s, `volver a poner ${describe(p)}`);
+      pushUndo(t, `volver a poner ${describe(p)}`);
       s.sold = s.sold.filter((x) => x.number !== p.number);
       s.pieces = sortPieces([...s.pieces, back]);
       s.updatedAt = ctx.now;
-      say(t, `Listo, ${describe(p)} volvió a la página.`);
+      say(t, `Listo, ${describe(p)} volvió a la página.`, sorry(t));
       return asItIs(t, back);
     }
     case "edit:confirm": {
@@ -788,10 +796,10 @@ function confirm(t: Turn) {
       rest(t);
       if (!p) return say(t, "Esa pieza ya no está en la página.");
       const next: Piece = { ...p, ...clean({ photo: step.draft.photo, title: step.draft.title, price: step.draft.price }), updatedAt: ctx.now };
-      pushUndo(s, `cambiar ${describe(p)}`);
+      pushUndo(t, `cambiar ${describe(p)}`);
       s.pieces = s.pieces.map((x) => (x.number === p.number ? next : x));
       s.updatedAt = ctx.now;
-      say(t, `Listo, ya cambié la ${p.number}.\n\nSi fue un error, escribime: deshacer`);
+      say(t, `Listo, ya cambié la ${p.number}.`, sorry(t));
       return asItIs(t, next);
     }
     default:
@@ -910,8 +918,15 @@ function help(): OutgoingMessage {
   );
 }
 
-function pushUndo(s: Store, label: string) {
-  s.undo = [...s.undo, { label, pieces: s.pieces, sold: s.sold }].slice(-10);
+function pushUndo(t: Turn, label: string) {
+  const { s } = t;
+  s.undo = [...s.undo, { id: t.ctx.now, label, pieces: s.pieces, sold: s.sold }].slice(-10);
 }
+
+/**
+ * El botón para arrepentirse lleva escrito qué cambio deshace. Si Norma lo toca días después,
+ * con otros cambios encima, no deshace otra cosa por error.
+ */
+const sorry = (t: Turn): ReplyButton[] => [{ id: `undo:${t.ctx.now}`, title: "Me equivoqué" }];
 
 const clean = <T extends object>(o: T) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined)) as Partial<T>;
