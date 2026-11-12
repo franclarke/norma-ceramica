@@ -22,14 +22,22 @@ Así que Norma no tiene panel: le escribe a su página por WhatsApp, como a cual
 **3/**
 Le manda una foto, el bot le propone un nombre, le pregunta cuánto sale, le muestra cómo va a quedar y ella toca "Sí, publicar". Al toque le llega la imagen de cómo quedó.
 
-Si la vende: "vendí la 14". Si se equivoca: "deshacer".
+Si la vende: "vendí la 14", o "vendí la jarrita blanca". Si dice "la taza" y tiene tres, le pregunta cuál. Si se equivoca: "deshacer".
 
 [captura del chat]
 
 **4/**
-Como no ve bien, también le puede mandar un audio: "la jarrita blanca ya la vendí".
+Como no ve bien, también le puede mandar un audio: "la catorce ahora sale nueve mil".
 
-La IA (AI SDK + AI Gateway) transcribe y traduce lo que dice a un comando del bot, pero nunca toca la página: siempre le muestra la foto y le pregunta antes. Si la IA no está, el bot anda igual.
+Los números, los precios y los nombres de sus piezas los entiende el bot solo. La IA (AI SDK + AI Gateway) transcribe el audio y ayuda cuando el bot no entiende, pero nunca toca la página: siempre le muestra la foto y le pregunta antes. Si la IA no está, el bot anda igual.
+
+**4b/** (opcional, si entra)
+Lo que más trabajo llevó no se ve:
+- "no sé" no es un no: no cancela nada
+- si manda 3 fotos juntas, las carga de a una
+- "no, la 16" corrige sin empezar de nuevo
+- si se le rompió una pieza, no la felicita por la venta
+- "no me acuerdo el número" le manda la lista
 
 **5/**
 El detalle que ordena todo es el numerito. Cada pieza tiene un número que nunca se repite.
