@@ -191,8 +191,7 @@
 
 /* Foto vertical (las del celular de Norma): en la ventanita apaisada perdía la mitad. Va casi entera
    (5:6, apenas recortada arriba y abajo), al centro, y sus bordes se funden con la misma foto
-   estirada y fuera de foco, que llena los costados. El fondo es una copia de 32 px: el desenfoque
-   casi no le cuesta al celular. */
+   estirada y fuera de foco, que llena los costados. El fondo es una copia de 64 px (menos de 1 KB). */
 .window[data-portrait] .photo {
   width: auto;
   height: 100%;
@@ -207,8 +206,9 @@
   inset: -10%;
   width: 120%;
   height: 120%;
-  max-width: none;
-  object-fit: fill;
+  background: center / 100% 100% no-repeat;
+  /* Probado sin filtro (la copia estirada sola): quedan manchas rectas. El desenfoque cuesta unos
+     20 ms en un celular lento y se ve mucho mejor. */
   filter: blur(9px);
 }
 

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { preload } from "react-dom";
@@ -32,6 +32,10 @@ const updatedLabel = (iso: string) =>
     .replace(",", "");
 
 const lower = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
+
+/** La misma foto a 64 px de ancho (menos de 1 KB), para el fondo fuera de foco de las fotos verticales. */
+const backdropOf = (piece: Piece) =>
+  getImageProps({ src: piece.photo.url, alt: "", width: 32, height: Math.round((32 * piece.photo.height) / piece.photo.width), quality: 60 }).props.src;
 
 export function StoreView({ store, compact = false, featured }: { store: PublicStore; compact?: boolean; featured?: number }) {
   // En el link de una pieza (/14), esa pieza va primero y grande; el resto sigue abajo.
@@ -182,9 +186,7 @@ function Tile({ piece, load, big = false }: { piece: Piece; load: Load; big?: bo
           className={s.slabImage}
         />
         <div className={s.window} data-portrait={portrait || undefined}>
-          {portrait && (
-            <Image src={piece.photo.url} alt="" width={32} height={Math.round((32 * piece.photo.height) / piece.photo.width)} quality={60} loading={loading} className={s.backdrop} />
-          )}
+          {portrait && <span className={s.backdrop} style={{ backgroundImage: `url("${backdropOf(piece)}")` }} aria-hidden />}
           <Image
             src={piece.photo.url}
             alt={`Foto de ${lower(piece.title)}`}
