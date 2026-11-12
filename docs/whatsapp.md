@@ -41,7 +41,9 @@ Listo: Norma le escribe "hola" al número y el bot le contesta con los botones. 
 
 ## Cómo se protege
 
-- Solo los números de `NORMA_WHATSAPP` pueden modificar la página. A cualquier otro, el bot le contesta con amabilidad y le pasa el número de Norma.
+- Solo los números de `NORMA_WHATSAPP` pueden modificar la página de Norma.
+- **Modo demo:** cualquier otro número recibe su propia tienda de prueba (como en el simulador) y el link para verla. El número no se guarda: la tienda se identifica con un hash. Con `WHATSAPP_DEMO=off` el bot solo le contesta con el teléfono de Norma.
+- Los celulares argentinos llegan como 549… y se responden como 54… (sin el 9), que es como los acepta la Cloud API.
 - Cada pedido se verifica con la firma `X-Hub-Signature-256`. Si WhatsApp está configurado y falta el `WHATSAPP_APP_SECRET`, el webhook rechaza todo.
 - WhatsApp reintenta los webhooks: cada mensaje se procesa una sola vez (se guardan los últimos ids).
 - Responder mensajes que inicia Norma (dentro de la ventana de 24 h) no tiene costo en la Cloud API.

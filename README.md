@@ -41,7 +41,7 @@ Cada pieza tiene su link (`/14`). Si un comprador se lo reenvía a alguien, la v
 
 ## Probarlo
 
-`/simulador` tiene a la izquierda el WhatsApp de Norma y a la derecha su página en el celular de un comprador. Cada visitante recibe **su propia tienda de prueba**, así nadie rompe la página real. Hay fotos de ejemplo, se puede subir una propia y, con la IA activa, grabar un audio con el micrófono. El simulador usa exactamente el mismo motor que el webhook de WhatsApp real.
+`/simulador` tiene a la izquierda el WhatsApp de Norma y a la derecha su página en el celular de un comprador. Cada visitante recibe **su propia tienda de prueba**, así nadie rompe la página real. Hay fotos de ejemplo, se puede subir una propia y, con la IA activa, grabar un audio con el micrófono. El simulador usa exactamente el mismo motor que el webhook de WhatsApp real. En WhatsApp real, cualquier número que no sea el de Norma también recibe su propia tienda de prueba (modo demo).
 
 **Para correrlo local** no hace falta configurar nada: sin variables de entorno guarda todo en `.data/`.
 

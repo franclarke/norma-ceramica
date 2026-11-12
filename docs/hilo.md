@@ -60,7 +60,9 @@ Lighthouse: accesibilidad 100.
 [captura del celular]
 
 **9/**
-Lo que no se puede probar sin el WhatsApp de Norma está en /simulador: el chat de un lado, la página del otro, con el mismo motor que el webhook real de la Cloud API. Cada visitante tiene su propia tienda de prueba, así que rompé lo que quieras.
+Para probarlo: /simulador tiene el chat de un lado y la página del otro, con el mismo motor que el WhatsApp real (Cloud API). Cada visitante tiene su propia tienda de prueba, así que rompé lo que quieras.
+
+Goncy, si lo querés probar en tu WhatsApp, pasame tu número por DM y te habilito: te va a armar tu propia tienda de prueba.
 
 **10/**
 Y lo probé con [nombre], que tiene [edad]. [Qué pasó: qué entendió sola, qué cambiamos después de verla usarlo.]
