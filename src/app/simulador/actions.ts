@@ -28,7 +28,7 @@ export async function sendToBot(form: FormData): Promise<SendResult> {
     if (kind === "audio") {
       const file = form.get("file");
       if (!(file instanceof File) || file.size === 0) return { ok: false, error: "No llegó el audio." };
-      if (file.size > 6 * 1024 * 1024) return { ok: false, error: "El audio es muy largo." };
+      if (file.size > 2 * 1024 * 1024) return { ok: false, error: "El audio es muy largo. Probá con uno más corto." };
       incoming = { kind: "audio", audio: new Uint8Array(await file.arrayBuffer()) };
     } else if (kind === "text") {
       const text = String(form.get("text") ?? "").slice(0, 500).trim();

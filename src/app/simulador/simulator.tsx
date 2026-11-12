@@ -21,7 +21,15 @@ function useRecorder(onAudio: (file: File) => void, onError: (msg: string) => vo
 
   useEffect(() => {
     if (!state) return;
-    const t = setInterval(() => setSeconds(Math.floor((Date.now() - state.started) / 1000)), 250);
+    const t = setInterval(() => {
+      const secs = Math.floor((Date.now() - state.started) / 1000);
+      setSeconds(secs);
+      // Como mucho 30 segundos: alcanza para decir lo que haga falta y cuida el crédito de la IA.
+      if (secs >= 30 && state.rec.state === "recording") {
+        send.current = true;
+        state.rec.stop();
+      }
+    }, 250);
     return () => clearInterval(t);
   }, [state]);
 

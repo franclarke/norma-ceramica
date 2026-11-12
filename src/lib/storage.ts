@@ -139,18 +139,42 @@ const getRedis = () => (redis ??= new Redis({ url: redisUrl()!, token: redisToke
 const DEMO_TTL = 60 * 60 * 24 * 2;
 
 function withRedis(files: Storage): Storage {
+  // Redis es la copia rápida; Blob (o el disco en local) la permanente. Se escribe en las dos,
+  // y si Redis no responde o se vació, se lee de la permanente sin perder nada.
+  const later = (job: () => Promise<unknown>) => {
+    try {
+      after(job);
+    } catch {
+      return job();
+    }
+  };
   return {
     ...files,
     async readJSON<T>(key: string) {
-      return (await getRedis().get<T>(key)) ?? null;
+      try {
+        const hit = await getRedis().get<T>(key);
+        if (hit) return hit;
+      } catch (e) {
+        console.error("redis read", e);
+        return files.readJSON<T>(key);
+      }
+      const stored = await files.readJSON<T>(key);
+      if (stored) await getRedis().set(key, stored).catch(() => {});
+      return stored;
     },
     async writeJSON(key, value) {
       const demo = key.startsWith("stores/demo-");
-      await getRedis().set(key, value, demo ? { ex: DEMO_TTL } : undefined);
+      try {
+        await getRedis().set(key, value, demo ? { ex: DEMO_TTL } : undefined);
+      } catch (e) {
+        console.error("redis write", e);
+        return files.writeJSON(key, value);
+      }
+      await later(() => files.writeJSON(key, value));
     },
     async remove(prefix) {
-      const keys = await getRedis().keys(`${prefix}*`);
-      if (keys.length) await getRedis().del(...keys);
+      const keys = await getRedis().keys(`${prefix}*`).catch(() => [] as string[]);
+      if (keys.length) await getRedis().del(...keys).catch(() => {});
       await files.remove(prefix);
     },
   };

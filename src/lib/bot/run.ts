@@ -1,7 +1,7 @@
 import "server-only";
 import { respond } from "./engine";
 import { detectIntent } from "./parse";
-import { interpret, suggestTitle, toCommand, transcribeVoice } from "./ai";
+import { interpret, suggestTitle, takeAiQuota, toCommand, transcribeVoice } from "./ai";
 import { loadStore, saveStore } from "../store";
 import type { ChatEntry, IncomingMessage, OutgoingMessage, Store } from "../types";
 
@@ -54,7 +54,7 @@ export async function runTurn(storeId: string, raw: ChannelMessage, opts: { mess
 /** Audio → texto, y foto sin nombre → nombre sugerido. */
 async function understand(store: Store, raw: ChannelMessage): Promise<IncomingMessage | null> {
   if (raw.kind === "audio") {
-    const text = await transcribeVoice(raw.audio);
+    const text = (await takeAiQuota(store.id)) ? await transcribeVoice(raw.audio) : null;
     return text ? { kind: "text", text, voice: true } : null;
   }
   if (raw.kind === "image" && !raw.suggestedTitle) {
@@ -62,7 +62,7 @@ async function understand(store: Store, raw: ChannelMessage): Promise<IncomingMe
     const isNewPiece = step === "idle" || step.startsWith("add:");
     const caption = raw.caption?.trim() ?? "";
     const captionHasTitle = caption && !/^\s*(la|pieza|n[º°o]?\.?)?\s*\d[\d.,\s]*(mil|lucas?)?\s*$/i.test(caption);
-    if (isNewPiece && !captionHasTitle) {
+    if (isNewPiece && !captionHasTitle && (await takeAiQuota(store.id))) {
       const url = raw.photo.url.startsWith("http") ? raw.photo.url : `${siteUrl()}${raw.photo.url}`;
       const suggested = await suggestTitle(new URL(url));
       if (suggested) return { ...raw, suggestedTitle: suggested };
@@ -82,7 +82,7 @@ export async function withAi(store: Store, msg: IncomingMessage): Promise<Incomi
   const intent = detectIntent(msg.text).type;
   const vague = intent === "unknown" || (["sold", "restore", "price", "rename", "edit"].includes(intent) && !/\d/.test(msg.text));
   const needsAi = (step === "idle" && vague) || (CONFIRM_STEPS.has(step) && !["yes", "no", "cancel", "undo"].includes(intent));
-  if (!needsAi) return msg;
+  if (!needsAi || !(await takeAiQuota(store.id))) return msg;
   const ai = await interpret(msg.text, store.pieces, store.sold);
   const command = ai ? toCommand(ai) : null;
   return command ? { kind: "text", text: command } : msg;

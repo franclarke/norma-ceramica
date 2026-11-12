@@ -12,27 +12,70 @@ import type { Piece } from "../types";
  */
 
 const MODELS = {
-  text: process.env.AI_TEXT_MODEL ?? "google/gemini-3.8-flash",
+  // Habilitado en el crédito gratuito del AI Gateway: rápido, con visión y salida estructurada.
+  text: process.env.AI_TEXT_MODEL ?? "google/gemini-2.5-flash",
   transcription: process.env.AI_TRANSCRIPTION_MODEL ?? "openai/gpt-transcribe",
 };
 const TIMEOUT_MS = 9000;
+
+// Gemini 2.5 Flash "piensa" por defecto: para elegir un comando no hace falta y tarda 4 veces más.
+const FAST = (tag: string) => ({
+  google: { thinkingConfig: { thinkingBudget: 0 } },
+  vertex: { thinkingConfig: { thinkingBudget: 0 } },
+  gateway: { tags: ["norma", tag] },
+});
 
 const configured = () =>
   process.env.AI !== "off" && Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN || process.env.VERCEL);
 
 // ¿Hay crédito en el AI Gateway? Se consulta cada 10 minutos por instancia: así la IA se prende
 // sola cuando la cuenta tiene saldo, y mientras tanto el bot no pierde tiempo en llamadas que fallan.
+// Tope de gasto: la cuenta tiene USD 5 de crédito gratis y no se gasta más que eso.
+// La IA se apaga sola cuando quedan menos de USD 1 de saldo.
+const MIN_BALANCE = Number(process.env.AI_MIN_BALANCE ?? 1);
 let health: { ok: boolean; at: number } | null = null;
 export async function aiAvailable(): Promise<boolean> {
   if (!configured()) return false;
-  if (health && Date.now() - health.at < 10 * 60_000) return health.ok;
+  if (health && Date.now() - health.at < 2 * 60_000) return health.ok;
   try {
     const { balance } = await gateway.getCredits();
-    health = { ok: Number(balance) > 0, at: Date.now() };
+    health = { ok: Number(balance) > MIN_BALANCE, at: Date.now() };
   } catch {
     health = { ok: false, at: Date.now() };
   }
   return health.ok;
+}
+
+/*
+ * Cupo de usos de IA, porque el simulador es público: por tienda (cada visitante del simulador
+ * o Norma) y global por día. Con Redis el conteo es compartido entre instancias; sin Redis es por
+ * instancia, y el saldo mínimo de arriba sigue siendo el freno final.
+ */
+const LIMITS = { perStore: Number(process.env.AI_DAILY_PER_STORE ?? 40), global: Number(process.env.AI_DAILY_GLOBAL ?? 300) };
+const memory = new Map<string, number>();
+
+export async function takeAiQuota(storeId: string): Promise<boolean> {
+  const day = new Date().toISOString().slice(0, 10);
+  const keys = [`ai:${day}:all`, `ai:${day}:${storeId}`];
+  const limits = [LIMITS.global, storeId === "norma" ? LIMITS.global : LIMITS.perStore];
+  const url = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
+  let counts: number[];
+  if (url && token) {
+    const { Redis } = await import("@upstash/redis");
+    const redis = new Redis({ url, token });
+    const p = redis.pipeline();
+    for (const k of keys) p.incr(k), p.expire(k, 60 * 60 * 48);
+    const res = (await p.exec()) as number[];
+    counts = [res[0], res[2]];
+  } else {
+    counts = keys.map((k) => {
+      const n = (memory.get(k) ?? 0) + 1;
+      memory.set(k, n);
+      return n;
+    });
+  }
+  return counts.every((n, i) => n <= limits[i]);
 }
 
 export async function transcribeVoice(audio: Uint8Array): Promise<string | null> {
@@ -91,6 +134,7 @@ export async function interpret(text: string, pieces: Piece[], sold: Piece[], mo
       system: SYSTEM,
       prompt: `Piezas en la página:\n${list(pieces)}\n\nPiezas que sacó (vendidas):\n${list(sold)}\n\nMensaje de Norma: «${text}»`,
       output: Output.object({ schema: IntentSchema }),
+      providerOptions: FAST("interpret"),
       abortSignal: AbortSignal.timeout(TIMEOUT_MS),
     });
     const all = [...pieces, ...sold];
@@ -152,6 +196,7 @@ export async function suggestTitle(image: URL | Uint8Array, model?: LanguageMode
           isCeramic: z.boolean(),
         }),
       }),
+      providerOptions: FAST("suggest-title"),
       messages: [
         {
           role: "user",
