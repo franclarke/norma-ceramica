@@ -762,7 +762,7 @@ function confirm(t: Turn) {
       s.nextNumber = number + 1;
       s.updatedAt = ctx.now;
       rest(t);
-      say(t, `¡Listo! «${d.title}» ya está en tu página con el número ${number}.\n\nCuando la vendas, escribime: vendí la ${number}`, sorry(t));
+      say(t, `¡Listo! «${d.title}» ya está en tu página con el número ${number}.\n\nCuando la vendas, escribime: vendí la ${number}`);
       asItIs(t, piece);
       return nextInQueue(t);
     }
@@ -788,7 +788,7 @@ function confirm(t: Turn) {
       s.sold = s.sold.filter((x) => x.number !== p.number);
       s.pieces = sortPieces([...s.pieces, back]);
       s.updatedAt = ctx.now;
-      say(t, `Listo, ${describe(p)} volvió a la página.`, sorry(t));
+      say(t, `Listo, ${describe(p)} volvió a la página.`);
       return asItIs(t, back);
     }
     case "edit:confirm": {
@@ -799,7 +799,7 @@ function confirm(t: Turn) {
       pushUndo(t, `cambiar ${describe(p)}`);
       s.pieces = s.pieces.map((x) => (x.number === p.number ? next : x));
       s.updatedAt = ctx.now;
-      say(t, `Listo, ya cambié la ${p.number}.`, sorry(t));
+      say(t, `Listo, ya cambié la ${p.number}.`);
       return asItIs(t, next);
     }
     default:
@@ -841,13 +841,17 @@ function undo(t: Turn) {
   say(t, `Listo, deshice lo último: ${last.label}. La página quedó como antes.`);
 }
 
-/** La tablilla tal cual la ve un comprador, para que Norma no tenga que abrir la página. */
+/**
+ * La tablilla tal cual la ve un comprador, para que Norma no tenga que abrir la página.
+ * Debajo, el botón para arrepentirse: está viendo cómo quedó, es el momento de notar un error.
+ */
 function asItIs(t: Turn, p: Piece) {
   t.touched = p.number;
   t.out.push({
     kind: "image",
     photo: { url: `/api/tablilla/${t.s.id}/${p.number}?v=${Date.parse(p.updatedAt)}`, width: 1200, height: 630 },
     caption: t.s.demo ? "Así quedó en tu página." : `Así quedó en tu página: ${t.ctx.siteUrl}/${p.number}`,
+    buttons: sorry(t),
   });
 }
 
