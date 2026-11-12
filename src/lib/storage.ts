@@ -39,7 +39,10 @@ const blobStorage: Storage = {
     const [latest] = await versions(key);
     if (!latest) return null;
     const res = await fetch(latest.url, { cache: "no-store" });
-    return res.ok ? ((await res.json()) as T) : null;
+    // "No existe" es solo cuando no hay ninguna versión. Si existe y no se pudo leer, es un error:
+    // devolver null haría que la tienda se cree de nuevo y pise la de Norma.
+    if (!res.ok) throw new Error(`blob read ${res.status}`);
+    return (await res.json()) as T;
   },
   async writeJSON(key, value) {
     const stamp = `${String(Date.now()).padStart(15, "0")}-${Math.random().toString(36).slice(2, 8)}`;
@@ -158,6 +161,8 @@ function withRedis(files: Storage): Storage {
         const hit = await getRedis().get<T>(key);
         if (hit) return hit;
       } catch (e) {
+        // Next corta las lecturas en vuelo cuando termina de prerenderizar: no es una falla de Redis.
+        if (String(e).includes("During prerendering")) throw e;
         console.error("redis read", e);
         return files.readJSON<T>(key);
       }
