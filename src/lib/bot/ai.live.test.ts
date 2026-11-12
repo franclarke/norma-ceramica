@@ -15,9 +15,9 @@ describe.runIf(live)("IA real", () => {
 
   it("entiende a Norma con sus palabras", async () => {
     const cases: [string, string][] = [
-      ["la jarrita blanca ya no la tengo", "vendí la 14"],
+      ["la jarrita blanca ya no la tengo", "sacá la 14"],
       ["bajale dos mil a la tetera", "la 23 ahora sale 19000"],
-      ["se me rompió el florerito azul", "vendí la 3"],
+      ["se me rompió el florerito azul", "sacá la 3"],
       ["¿qué tengo publicado?", "lista"],
     ];
     for (const [text, expected] of cases) {
@@ -37,6 +37,6 @@ describe.runIf(live)("IA real", () => {
     console.log("transcripción:", text);
     expect(text?.toLowerCase()).toContain("jarrita");
     const r = await interpret(text!, pieces, []);
-    expect(r && toCommand(r)).toBe("vendí la 14");
+    expect(r && toCommand(r, "sold")).toBe("vendí la 14");
   }, 60_000);
 });

@@ -152,11 +152,13 @@ export async function interpret(text: string, pieces: Piece[], sold: Piece[], mo
 }
 
 /** Traduce la intención a la frase que el bot determinístico ya entiende. */
-export function toCommand(i: AiIntent): string | null {
+export function toCommand(i: AiIntent, why?: "sold" | "broken"): string | null {
   const n = i.number;
   switch (i.action) {
     case "sold":
-      return n !== null ? `vendí la ${n}` : "vendí una";
+      // "Ya no la tengo" no dice que la vendió: el bot no festeja lo que Norma no contó.
+      if (n === null) return "vendí una";
+      return why === "sold" ? `vendí la ${n}` : why === "broken" ? `se rompió la ${n}` : `sacá la ${n}`;
     case "restore":
       return n !== null ? `volví a tener la ${n}` : null;
     case "price":

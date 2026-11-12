@@ -26,7 +26,9 @@ const replying = (json: object) =>
 describe("interpret", () => {
   it("lleva el nombre de una pieza a su número", async () => {
     const r = await interpret("la jarrita blanca ya no la tengo", pieces, [], replying({ action: "sold", number: 14, price: null, title: null }));
-    expect(r && toCommand(r)).toBe("vendí la 14");
+    expect(r && toCommand(r)).toBe("sacá la 14");
+    expect(r && toCommand(r, "sold")).toBe("vendí la 14");
+    expect(r && toCommand(r, "broken")).toBe("se rompió la 14");
   });
 
   it("descarta números que no existen", async () => {

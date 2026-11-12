@@ -1,6 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { respond } from "./engine";
+import { detectIntent } from "./parse";
 import { aiAvailable, interpret, suggestTitle, takeAiQuota, toCommand, transcribeVoice } from "./ai";
 import { loadStore, saveStore } from "../store";
 import { sharedRedis } from "../storage";
@@ -45,7 +46,7 @@ async function turn(storeId: string, raw: ChannelMessage, opts: { messageId?: st
     // Nada cambia en la página sin la confirmación de siempre.
     if (result.missed && incoming.kind === "text" && (await takeAiQuota(store.id))) {
       const ai = await interpret(incoming.text, store.pieces, store.sold, undefined, asking(store.conversation));
-      const command = ai ? toCommand(ai) : null;
+      const command = ai ? toCommand(ai, detectIntent(incoming.text).why) : null;
       const again = command ? respond(store, { kind: "text", text: command }, ctx) : null;
       // Si el bot ya sabía qué quería y solo faltaba cuál, la IA sirve si encontró la pieza.
       if (again && !again.missed && (result.missed === "all" || ai?.number != null)) result = again;
