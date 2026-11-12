@@ -41,7 +41,14 @@ const absolute = (url: string, base: string) => (url.startsWith("http") ? url : 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 /** Traduce una respuesta del bot al formato de la Cloud API. */
-export function toWhatsApp(to: string, m: OutgoingMessage, base: string) {
+/**
+ * Los celulares argentinos llegan en el webhook como 549 + área + número, pero la Cloud API
+ * los reconoce (y los autoriza en la lista de prueba) sin el 9: 54 + área + número.
+ */
+export const toRecipient = (waId: string) => (/^549\d{10}$/.test(waId) ? `54${waId.slice(3)}` : waId);
+
+export function toWhatsApp(rawTo: string, m: OutgoingMessage, base: string) {
+  const to = toRecipient(rawTo);
   const buttons = m.buttons?.slice(0, 3).map((b) => ({ type: "reply", reply: { id: b.id, title: clip(b.title, 20) } }));
   if (m.kind === "text") {
     if (!buttons?.length) return { messaging_product: "whatsapp", to, type: "text", text: { body: m.text, preview_url: true } };
