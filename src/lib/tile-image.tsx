@@ -23,10 +23,22 @@ const fonts = Promise.all(
 );
 
 /** Satori no lee WebP: todo se pasa a PNG (o JPEG para la foto) como data URI. */
-async function asDataUri(url: string, base: string, opts: { width: number; height?: number; png?: boolean; white?: boolean }) {
+async function asDataUri(url: string, base: string, opts: { width: number; height?: number; png?: boolean; white?: boolean; whole?: boolean }) {
   const res = await fetch(url.startsWith("http") ? url : new URL(url, base));
   if (!res.ok) throw new Error(`no pude bajar ${url}: ${res.status}`);
-  let img = sharp(Buffer.from(await res.arrayBuffer())).resize({ width: opts.width, height: opts.height, fit: opts.height ? "cover" : "inside" });
+  const source = Buffer.from(await res.arrayBuffer());
+  let img = sharp(source).resize({ width: opts.width, height: opts.height, fit: opts.height ? "cover" : "inside" });
+  if (opts.whole && opts.height) {
+    // Igual que en la página: la foto vertical va casi entera (5:6) al centro, con los bordes
+    // fundidos en la misma foto estirada y fuera de foco.
+    const w = Math.round((opts.height * 5) / 6);
+    const fade = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${opts.height}"><defs><linearGradient id="g"><stop offset="0" stop-opacity="0"/><stop offset=".09"/><stop offset=".91"/><stop offset="1" stop-opacity="0"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`,
+    );
+    const whole = await sharp(source).resize({ width: w, height: opts.height, fit: "cover" }).ensureAlpha().composite([{ input: fade, blend: "dest-in" }]).png().toBuffer();
+    const back = await sharp(source).resize({ width: opts.width, height: opts.height, fit: "fill" }).blur(16).toBuffer();
+    img = sharp(back).composite([{ input: whole, gravity: "centre" }]);
+  }
   if (opts.white) {
     // El logo es una máscara: lo pintamos de blanco conservando su alfa.
     const alpha = await img.clone().extractChannel(3).toBuffer();
@@ -44,7 +56,7 @@ export async function tileImage(piece: Piece, base: string, opts: { sold?: boole
   const [wall, slab, photo, logo, fontData] = await Promise.all([
     asDataUri("/plates/glaze-cobalt.webp", base, { width: W, height: H }),
     asDataUri(`/plates/tile-${glaze}.webp`, base, { width: tileW, png: true }),
-    asDataUri(piece.photo.url, base, { width: Math.round(tileW * 0.81), height: Math.round(tileH * 0.55) }),
+    asDataUri(piece.photo.url, base, { width: Math.round(tileW * 0.81), height: Math.round(tileH * 0.55), whole: piece.photo.height > piece.photo.width * 1.1 }),
     asDataUri("/plates/logo.webp", base, { width: 300, white: true }),
     fonts,
   ]);
@@ -75,7 +87,7 @@ export async function tileImage(piece: Piece, base: string, opts: { sold?: boole
               color: "#2b1a0e",
             }}
           >
-            <div style={{ fontSize: 76, fontWeight: 800, color: "#4a2c17", width: 120, justifyContent: "center", display: "flex" }}>{piece.number}</div>
+            <div style={{ fontSize: 76, fontWeight: 800, color: "#36200f", width: 120, justifyContent: "center", display: "flex" }}>{piece.number}</div>
             <div style={{ width: 3, height: 70, background: "rgba(74,44,23,0.4)", margin: "0 22px 0 8px" }} />
             <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
               <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.1 }}>{piece.title}</div>

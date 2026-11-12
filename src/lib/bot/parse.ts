@@ -282,7 +282,7 @@ export function cleanTitle(raw: string): string {
     .replace(/[\s.,;:!\-–]+$/g, "")
     .trim();
   if (!t) return "";
-  const clipped = t.length > 48 ? `${t.slice(0, 47).trimEnd()}…` : t;
+  const clipped = t.length > 40 ? `${t.slice(0, 39).trimEnd()}…` : t;
   return clipped.charAt(0).toUpperCase() + clipped.slice(1);
 }
 

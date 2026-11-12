@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function SimuladorPage() {
   return (
-    <div className={s.page}>
+    <main className={s.page}>
       <header className={s.head}>
         <Link href="/" className={s.home} aria-label="Ir a la página de Norma">
           <span className="brush" style={{ "--src": "url(/plates/logo.webp)" } as CSSProperties} aria-hidden />
@@ -33,11 +33,12 @@ export default function SimuladorPage() {
       <Suspense fallback={<p className={s.loading}>Abriendo el WhatsApp de Norma…</p>}>
         <SimulatorLoader />
       </Suspense>
-    </div>
+    </main>
   );
 }
 
 async function SimulatorLoader() {
+  // La tienda de prueba se asigna en src/proxy.ts; la redirección queda solo como red de seguridad.
   const id = (await cookies()).get("norma-sim")?.value;
   if (!id || !isDemoId(id)) redirect("/simulador/nuevo");
   const store = await loadStore(id);

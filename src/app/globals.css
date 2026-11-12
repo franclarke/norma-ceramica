@@ -8,10 +8,10 @@
   --glaze-soft: #dfe5ff; /* texto secundario sobre cobalto, 6:1 en el punto más claro del esmalte */
   --glaze-line: rgb(223 229 255 / 0.28);
   --bisque: #d9bd93;
-  --clay-ink: #2b1a0e; /* texto sobre barro crudo, 10:1 */
-  --clay-groove: #4a2c17; /* números de pieza, tinta de sello */
+  --clay-ink: #2b1a0e; /* texto sobre barro crudo: 6.5:1 o más medido sobre la losa real */
+  --clay-groove: #36200f; /* números de pieza, tinta de sello: 6:1 o más medido sobre el barro real */
   --amber: #ffd36e; /* foco y selección */
-  --font: var(--font-atkinson), "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font: var(--font-atkinson), "Atkinson Hyperlegible Next", "Respaldo Roboto", "Respaldo Arial", system-ui, sans-serif;
 
   --step-0: clamp(1.25rem, 1.15rem + 0.4vw, 1.4rem); /* cuerpo: 20–22px */
   --step-1: clamp(1.5rem, 1.3rem + 0.8vw, 1.85rem);
@@ -20,6 +20,67 @@
 
 @theme inline {
   --font-sans: var(--font);
+}
+
+/*
+ * Mientras baja Atkinson, el texto se pinta con la letra del teléfono (Roboto en Android, Arial en
+ * iPhone y compu) estirada al mismo ancho, peso por peso. Cuando llega la buena, los renglones
+ * quedan donde estaban: con mala señal, la página no salta mientras alguien ya está leyendo.
+ * Los valores salen de medir las tres fuentes con la frecuencia de letras del castellano.
+ */
+@font-face {
+  font-family: "Respaldo Roboto";
+  src: local("Roboto");
+  font-weight: 100 599;
+  size-adjust: 99.44%;
+  ascent-override: 98.96%;
+  descent-override: 31.78%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Respaldo Roboto";
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 600 750;
+  size-adjust: 105.47%;
+  ascent-override: 93.3%;
+  descent-override: 29.96%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Respaldo Roboto";
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 751 900;
+  size-adjust: 109.23%;
+  ascent-override: 90.08%;
+  descent-override: 28.93%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Respaldo Arial";
+  src: local("Arial"), local("ArialMT");
+  font-weight: 100 599;
+  size-adjust: 99.45%;
+  ascent-override: 98.95%;
+  descent-override: 31.78%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Respaldo Arial";
+  src: local("Arial Bold"), local("Arial-BoldMT");
+  font-weight: 600 750;
+  size-adjust: 99.11%;
+  ascent-override: 99.29%;
+  descent-override: 31.89%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Respaldo Arial";
+  src: local("Arial Bold"), local("Arial-BoldMT");
+  font-weight: 751 900;
+  size-adjust: 102.65%;
+  ascent-override: 95.86%;
+  descent-override: 30.79%;
+  line-gap-override: 0%;
 }
 
 html {
@@ -39,14 +100,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* La pared: una sola foto de esmalte, quieta detrás de todo (sin mosaico ni repeticiones). */
+/* La pared: una sola foto de esmalte, quieta detrás de todo (sin mosaico ni repeticiones).
+   En el celular va la misma foto a 1000 px (9 KB en vez de 29): a ese tamaño no se distinguen. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: var(--cobalt) url(/plates/glaze-cobalt.webp) center / cover no-repeat;
+  background: var(--cobalt) url(/plates/glaze-cobalt-1000.webp) center / cover no-repeat;
   pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  body::before {
+    background-image: url(/plates/glaze-cobalt.webp);
+  }
 }
 
 ::selection {
@@ -62,6 +130,7 @@ body::before {
 
 a {
   color: inherit;
+  text-decoration-line: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: 2px;
 }

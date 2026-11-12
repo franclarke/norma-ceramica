@@ -23,8 +23,8 @@ export default function Privacidad() {
 
       <h2>Quienes miran la página</h2>
       <p>
-        No hace falta registrarse ni dejar ningún dato. No usamos cookies de publicidad ni de seguimiento. Medimos solo el rendimiento de
-        la página (cuánto tarda en cargar), de forma anónima, con Vercel Speed Insights.
+        No hace falta registrarse ni dejar ningún dato. No usamos cookies de publicidad ni de seguimiento, ni medimos qué hace cada
+        visitante. El simulador guarda una sola cookie, para acordarse de cuál es tu tienda de prueba.
       </p>
 
       <h2>Quienes le escriben al ayudante de WhatsApp</h2>
@@ -33,8 +33,9 @@ export default function Privacidad() {
           Cuando alguien le escribe al número del ayudante, WhatsApp (Meta) nos manda el mensaje y el número de teléfono de quien escribe.
         </li>
         <li>
-          Solo el número de Norma puede cambiar la página. A cualquier otra persona, el ayudante le contesta con el teléfono de Norma y no
-          guarda su mensaje.
+          Solo el número de Norma puede cambiar la página. A cualquier otra persona, el ayudante le arma una tienda de prueba para que
+          vea cómo funciona: su número no se guarda (la tienda se identifica con un código que no permite reconstruirlo) y esa tienda,
+          con su conversación, se borra sola a los dos días.
         </li>
         <li>
           De Norma se guardan las fotos, nombres y precios de sus piezas, y el estado de la conversación necesario para seguirla, como

@@ -1,0 +1,38 @@
+.page {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  max-width: 34rem;
+  padding: clamp(22px, 5.5vw, 56px) clamp(16px, 4.5vw, 56px) 80px;
+}
+
+.logo {
+  display: block;
+  width: min(52vw, 270px);
+  margin: 0 0 12px -4px;
+}
+
+.logo span {
+  aspect-ratio: 698 / 333;
+  color: var(--glaze-white);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--step-2);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.text {
+  margin: 0;
+  font-size: var(--step-1);
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.text a {
+  font-weight: 700;
+}

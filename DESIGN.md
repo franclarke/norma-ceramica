@@ -9,7 +9,7 @@ colors:
   glaze-line: "rgb(223 229 255 / 0.28)"
   bisque: "#d9bd93"
   clay-ink: "#2b1a0e"
-  clay-groove: "#4a2c17"
+  clay-groove: "#36200f"
   amber: "#ffd36e"
   amber-ink: "#1b1200"
 typography:
@@ -141,8 +141,8 @@ Un mundo de dos materiales: esmalte cobalto profundo para el fondo y barro crudo
 - **Esmalte Lavado** (glaze-soft): texto secundario (fecha, explicación, encabezados de tabla, pie). 10.5:1 sobre el cobalto plano, no menos de 6:1 en el punto más claro de la textura.
 - **Línea de Esmalte** (glaze-line): filetes de la tabla y separador del bloque de contacto (1–2px).
 - **Bizcocho** (bisque): referencia del barro crudo de las losas; la franja real es raster, el token fija contra qué se mide el contraste.
-- **Tinta de Barro** (clay-ink): nombre y precio sobre el barro, 9.3:1.
-- **Tinta de Sello** (clay-groove): el número de pieza, 7.0:1 sobre el barro.
+- **Tinta de Barro** (clay-ink): nombre y precio sobre el barro. Medido sobre la losa real (no sobre el color plano): mediana de 6.5 a 7.4:1 según el esmalte.
+- **Tinta de Sello** (clay-groove, #36200f): el número de pieza. Medido sobre la losa real, 6:1 o más de mediana; es texto de 45 a 70 px.
 
 ### Named Rules
 **The Un Solo Acento Rule.** El ámbar significa "acá estás", "esto cambió" o "mirá el cambio": foco, selección, aviso y su botón. Si no es estado, no es ámbar.
@@ -174,9 +174,9 @@ Un mundo de dos materiales: esmalte cobalto profundo para el fondo y barro crudo
 
 Una pared, no una grilla de tienda. Margen lateral `--gutter`.
 
-- **Celular (<640px):** una columna. Logo (min(62vw, 270px), proporción 698 / 333), saludo, bloque de contacto con el teléfono en su propia línea, fecha; la primera tablilla asoma en la primera pantalla. Las tablillas siguen verticales en celular: la variante apaisada se descartó porque achicaba la foto de la pieza.
+- **Celular (<640px):** una columna. Logo (min(52vw, 270px), proporción 698 / 333), saludo (1.375rem por debajo de 400px, para que entre en tres renglones) y bloque de contacto con el teléfono en su propia línea. El clavo de la primera tablilla queda a unos 475px en un celular de 360px de ancho: la pieza asoma siempre en la primera pantalla. La fecha del último cambio va en el pie. Las tablillas siguen verticales en celular: la variante apaisada se descartó porque achicaba la foto de la pieza.
 - **≥640px:** tablillas en 2 columnas.
-- **≥1024px:** columna izquierda de clamp(330px, 26vw, 420px) con el encabezado `sticky` (top 48px) y el logo a min(100%, 280px); la pared a la derecha, todavía en 2 columnas.
+- **≥1024px:** columna izquierda de clamp(330px, 26vw, 420px) con el encabezado `sticky` (top 40px) solo si la pantalla mide 700px de alto o más (en una notebook baja quedaba cortado); mientras acompaña, el bloque de contacto del final se oculta y el logo a min(100%, 280px); la pared a la derecha, todavía en 2 columnas.
 - **≥1360px:** 3 columnas de tablillas.
 - Espacio entre tablillas: `tile-row-gap` vertical y `tile-col-gap` horizontal (el vertical es mayor: hay lugar para que se hamaquen). El dorso arranca a `section-break` y el pie a 56px.
 - **Simulador:** máximo 1180px centrado; dos celulares lado a lado desde 1024px. Debajo de eso, una pestaña "chat / página" y el botón ámbar "Ver cómo quedó la página" dentro del hilo cuando hay un cambio.
@@ -235,7 +235,7 @@ El chat del simulador usa los colores reales de WhatsApp a propósito, para que 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** mantener el texto principal en glaze-white y el secundario en glaze-soft sobre el cobalto; sobre barro, clay-ink (9.3:1) y clay-groove (7.0:1). Cualquier texto nuevo necesita como mínimo 4.5:1 contra el punto más claro de su fondo, y conviene apuntar a 7:1.
+- **Do** mantener el texto principal en glaze-white y el secundario en glaze-soft sobre el cobalto; sobre barro, clay-ink y clay-groove (6:1 o más medido sobre la losa real, en texto grande). Cualquier texto nuevo necesita como mínimo 4.5:1 contra el punto más claro de su fondo, y conviene apuntar a 7:1.
 - **Do** usar `--step-0` (20–22px) para todo texto que se lee, incluidas la fecha, el pie y los encabezados de tabla; nada del mundo de Norma baja de 1rem.
 - **Do** dar a todo control al menos 44px de alto (48px en el mundo de Norma) y foco visible ámbar (3px, offset 4px).
 - **Do** que toda acción y todo dato funcione sin hover: el hover sólo agrega el balanceo, que también responde al toque.
@@ -257,3 +257,17 @@ El chat del simulador usa los colores reales de WhatsApp a propósito, para que 
 - **Imagen de la tablilla (`/api/tablilla/[store]/[n]`, 1200×630).** Se genera con `next/og`: la pared cobalto, la tablilla con su losa y su foto a la izquierda, y a la derecha el logo blanco, "Pieza Nº", el nombre (64px, 800) y el precio (72px, 800). Usa las mismas plates, convertidas a PNG porque Satori no lee WebP, y Atkinson Hyperlegible Next en TTF (`src/assets/fonts`). Es la vista previa de los links y la respuesta "Así quedó en tu página" del bot.
 - **Audio en el simulador (excepción WhatsApp).** El micrófono reemplaza al botón de enviar cuando el campo está vacío. Mientras graba, muestra un punto rojo #e53935 que late cada 1,2s, el tiempo en cifras tabulares y dos botones: Cancelar y Mandar. La burbuja de un audio arranca con "Audio · lo que entendí:" en el verde #008069 de WhatsApp, a 0.95rem.
 - **Las tablillas son imágenes optimizadas** (`next/image` con `fill`, AVIF y tamaños por pantalla), no fondos CSS. La primera carga con prioridad.
+
+## Agregados después de la segunda revisión (2026-11-12)
+
+- **Fotos verticales.** Las fotos más altas que anchas (alto > 1.1 × ancho, las que saca Norma con el celular parado) no se recortan a la ventana apaisada: van al centro en 5:6, con los bordes laterales fundidos (máscara de 9%) sobre la misma foto estirada y fuera de foco (copia de 32px, `blur(9px)`). La imagen de la tablilla (`/api/tablilla`) hace lo mismo.
+- **Nombre largo.** Con más de 28 caracteres el nombre baja a `clamp(1.25rem, 6cqw, 1.45rem)` para que tres renglones entren en la franja de barro. El bot corta los nombres a 40 caracteres.
+- **Links.** Subrayados siempre (2px, offset 0.2em): en el mundo de Norma el color no distingue un link del texto.
+- **Fecha.** "La última vez que cambié algo fue el miércoles 11 de noviembre.", en el pie y en la voz de Norma.
+- **Pieza compartida.** El título pasa a "Esta es la 14, la que te mandaron". "Las demás piezas del taller" queda pegado a la pared que anuncia (4px abajo, 56–88px arriba).
+- **No encontrado.** `not-found.tsx`: la pared, el logo, "Acá no hay nada colgado." y un link a la página.
+- **Tablilla tocada.** El `li` lleva `tabindex="-1"`: al tocarla queda enfocada y el balanceo se completa (sin anillo ni destello: no es un control).
+- **Lectores de pantalla.** La etiqueta de la tablilla ya no es `aria-hidden`: se lee "Pieza número 24", el nombre y el precio. "¿Te gustó alguna?" es un `h2`.
+- **Fuente de respaldo.** "Respaldo Roboto" y "Respaldo Arial" no son una segunda tipografía: son la letra del sistema con `size-adjust` por peso (400, 700, 800), medida contra Atkinson, para que el texto no salte cuando termina de bajar la fuente.
+- **Fondo en celular.** Por debajo de 900px el esmalte es la misma plate a 1000px (`glaze-cobalt-1000.webp`, 9 KB).
+- **Losas.** Se piden a calidad 60 y un escalón más chicas que su ancho (textura de gres); la primera con `fetchpriority="high"`.

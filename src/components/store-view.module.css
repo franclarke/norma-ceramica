@@ -7,7 +7,7 @@
 }
 
 .intro {
-  padding: clamp(28px, 6vw, 56px) var(--gutter) 8px;
+  padding: clamp(22px, 5.5vw, 56px) var(--gutter) 0;
 }
 
 .introInner {
@@ -22,7 +22,7 @@
 }
 
 .logoMark {
-  width: min(62vw, 270px);
+  width: min(52vw, 270px);
   aspect-ratio: 698 / 333;
   color: var(--glaze-white);
   margin-left: -4px;
@@ -33,21 +33,25 @@
   font-size: var(--step-1);
   line-height: 1.35;
   font-weight: 400;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
-.updated {
-  margin: 0;
-  text-wrap: balance;
-  font-size: var(--step-0);
-  color: var(--glaze-soft);
+/* En los celulares angostos el saludo ocupa tres renglones y no cuatro: así la primera tablilla
+   ya asoma al abrir la página. */
+@media (max-width: 400px) {
+  .hello {
+    font-size: 1.375rem;
+  }
+  .introInner {
+    gap: 18px;
+  }
 }
 
 /* ---------- ¿Te gustó alguna? ---------- */
 .contact {
   display: grid;
   gap: 4px;
-  padding: 20px 0 6px;
+  padding: 18px 0 0;
   border-top: 2px solid var(--glaze-line);
 }
 
@@ -95,7 +99,7 @@
 
 /* ---------- Las tablillas ---------- */
 .main {
-  padding: 28px var(--gutter) 40px;
+  padding: 14px var(--gutter) 40px;
   min-width: 0;
 }
 
@@ -116,6 +120,9 @@
   container-type: inline-size;
   rotate: var(--tilt);
   transform-origin: 50% 1.5%;
+  /* Se enfoca al tocarla (para hamacarse), pero no es un botón: sin destello ni anillo. */
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 /* La firma: al tocarla o pasarle el mouse, la tablilla se hamaca sobre su clavo. */
@@ -175,10 +182,34 @@
 }
 
 .photo {
+  position: relative;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Foto vertical (las del celular de Norma): en la ventanita apaisada perdía la mitad. Va casi entera
+   (5:6, apenas recortada arriba y abajo), al centro, y sus bordes se funden con la misma foto
+   estirada y fuera de foco, que llena los costados. El fondo es una copia de 32 px: el desenfoque
+   casi no le cuesta al celular. */
+.window[data-portrait] .photo {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 5 / 6;
+  margin-inline: auto;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+.backdrop {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  max-width: none;
+  object-fit: fill;
+  filter: blur(9px);
 }
 
 /* La franja de barro crudo: número grabado y, al lado, nombre y precio. */
@@ -232,6 +263,11 @@
   text-wrap: balance;
 }
 
+/* Un nombre largo ocupa tres renglones: un punto menos de letra para que no pise el esmalte. */
+.title[data-long] {
+  font-size: clamp(1.25rem, 6cqw, 1.45rem);
+}
+
 .price {
   font-size: clamp(1.55rem, 8.5cqw, 2.1rem);
   font-weight: 800;
@@ -281,6 +317,11 @@
   vertical-align: top;
 }
 
+/* La última fila no lleva filete: enseguida viene el del bloque de contacto. */
+.list tr:last-child td {
+  border-bottom: 0;
+}
+
 .list td:first-child,
 .list th:first-child {
   width: 3.2ch;
@@ -297,6 +338,8 @@
 
 .footer {
   margin-top: 56px;
+  display: grid;
+  gap: 14px;
   font-size: var(--step-0);
   line-height: 1.5;
   color: var(--glaze-soft);
@@ -329,14 +372,22 @@
     width: min(100%, 280px);
   }
 
-  .wall:not([data-compact]) .introInner {
-    position: sticky;
-    top: 48px;
-  }
-
   .wall:not([data-compact]) .main {
     padding-top: 64px;
     padding-left: clamp(32px, 4vw, 64px);
+  }
+}
+
+/* La presentación acompaña el recorrido solo si entra entera en la pantalla (en una notebook baja
+   quedaba cortada). Mientras acompaña, el contacto del final sobra: ya está al lado. */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .wall:not([data-compact]) .introInner {
+    position: sticky;
+    top: 40px;
+  }
+
+  .wall:not([data-compact]) .contact[data-again] {
+    display: none;
   }
 }
 
@@ -351,7 +402,6 @@
   display: grid;
   gap: 22px;
   max-width: 34rem;
-  margin-bottom: clamp(48px, 7vw, 72px);
 }
 
 .featuredTitle {
@@ -379,17 +429,18 @@
   white-space: nowrap;
 }
 
+/* El título queda pegado a la pared que anuncia, y lejos de la pieza de arriba. */
 .allTitle {
-  margin: clamp(32px, 5vw, 48px) 0 0;
+  margin: clamp(56px, 9vw, 88px) 0 4px;
   font-size: var(--step-1);
   font-weight: 800;
+  line-height: 1.2;
 }
 
 /* En el celular, el link de una pieza abre con la pieza: arriba queda solo el logo. */
 @media (max-width: 1023px) {
   .wall[data-featured] .hello,
-  .wall[data-featured] .intro .contact,
-  .wall[data-featured] .updated {
+  .wall[data-featured] .intro .contact {
     display: none;
   }
   .wall[data-featured] .intro {

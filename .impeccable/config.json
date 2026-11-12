@@ -1,3 +1,19 @@
 {
-  "buildPath": "comp"
+  "buildPath": "comp",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "respaldo roboto",
+        "createdAt": "2026-11-12T14:33:41.520Z"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "respaldo arial",
+        "createdAt": "2026-11-12T14:33:42.031Z"
+      }
+    ]
+  }
 }
