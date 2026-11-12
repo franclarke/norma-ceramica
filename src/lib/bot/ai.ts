@@ -200,7 +200,7 @@ export async function suggestTitle(image: URL | Uint8Array, model?: LanguageMode
       model: model ?? gateway(MODELS.text),
       output: Output.object({
         schema: z.object({
-          title: z.string().describe("Nombre de 2 a 4 palabras, en castellano rioplatense, como una ceramista nombra su pieza. Ej: Taza celeste, Jarra blanca, Florero alto."),
+          title: z.string().describe("Nombre de 2 a 4 palabras, en castellano rioplatense, como una ceramista nombra su pieza, sin palabras en inglés (cuenco o bol, nunca bowl; taza, nunca mug). Ej: Taza celeste, Jarra blanca, Cuenco azul."),
           isCeramic: z.boolean(),
         }),
       }),
