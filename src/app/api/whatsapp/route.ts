@@ -41,6 +41,8 @@ export async function POST(req: Request) {
 
 async function handle(m: WebhookMessage) {
   const base = siteUrl();
+  // Sin datos personales: tipo de mensaje, si es de Norma y los últimos 4 dígitos.
+  console.log(`whatsapp in: ${m.type} · dueño=${isOwner(m.from)} · …${m.from.slice(-4)} · largo=${m.from.length}`);
   if (!isOwner(m.from)) {
     const store = await loadStore(NORMA);
     await sendMessages(

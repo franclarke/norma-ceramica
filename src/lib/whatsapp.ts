@@ -65,6 +65,7 @@ export async function sendMessages(to: string, messages: OutgoingMessage[], base
       body: JSON.stringify(toWhatsApp(to, m, base)),
     });
     if (!res.ok) console.error("whatsapp send", res.status, await res.text());
+    else console.log("whatsapp out:", m.kind, m.buttons?.length ? `${m.buttons.length} botones` : "");
   }
 }
 
