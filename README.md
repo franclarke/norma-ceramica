@@ -56,9 +56,10 @@ npm install && npm run dev
 ## Stack
 
 - **Next.js 16** (App Router, Cache Components) en **Vercel**.
-- **Vercel Blob** para las fotos. Los datos van en **Upstash Redis** (Marketplace de Vercel) cuando está conectado; si no, en Blob, donde cada guardado es una versión nueva e inmutable, porque sobrescribir el mismo archivo devolvía lecturas viejas durante minutos.
+- **Vercel Blob** para las fotos y como copia permanente de los datos. **Upstash Redis** es la copia rápida: se escribe en las dos, y si Redis no responde, se lee de Blob sin perder nada. En Blob cada guardado es una versión nueva e inmutable, porque sobrescribir el mismo archivo devolvía lecturas viejas durante minutos.
 - La página de Norma y las de cada pieza son estáticas: se cachean con `'use cache: remote'` y un tag que se invalida cuando ella cambia algo.
-- **AI SDK 7 + AI Gateway**: transcripción, salida estructurada validada con Zod y visión. Tests con `MockLanguageModelV4`.
+- **AI SDK 7 + AI Gateway**: transcripción (`openai/gpt-transcribe`) y Gemini 2.5 Flash sin razonamiento para entender y mirar fotos (~1 s por respuesta). Salida estructurada validada con Zod. Tests con `MockLanguageModelV4` y una prueba contra los modelos reales (`AI_LIVE=1`).
+- **Tope de gasto de IA**: se apaga sola con menos de USD 1 de saldo, y tiene cupo diario por tienda y global (el simulador es público). Los audios del simulador duran como mucho 30 segundos.
 - Las imágenes de cada tablilla (vista previa de los links y "así quedó") se generan con `next/og`.
 - Speed Insights para medir en usuarios reales.
 - **WhatsApp Cloud API** (`/api/whatsapp`): webhook con verificación de firma, botones interactivos, descarga de fotos y deduplicación de reintentos. Ver [docs/whatsapp.md](docs/whatsapp.md).
