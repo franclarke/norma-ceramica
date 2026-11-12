@@ -396,8 +396,11 @@ export function Simulator({
             className={s.frame}
             // Después de un cambio, la página abre en las piezas. El ancla sola a veces no alcanza
             // (el contenido llega por streaming), así que se asegura al terminar de cargar.
+            // Se mueve solo la ventana de adentro: scrollIntoView arrastraría también la página de afuera.
             onLoad={(e) => {
-              if (pageVersion) e.currentTarget.contentDocument?.getElementById("piezas")?.scrollIntoView({ block: "start" });
+              const view = e.currentTarget.contentWindow;
+              const tiles = view?.document.getElementById("piezas");
+              if (pageVersion && view && tiles) view.scrollTo({ top: tiles.getBoundingClientRect().top + view.scrollY - 8 });
             }}
           />
         </div>
