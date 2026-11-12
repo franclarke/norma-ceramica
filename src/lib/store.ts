@@ -17,6 +17,10 @@ export async function loadStore(id: string): Promise<Store> {
   return fresh;
 }
 
+export async function storeExists(id: string): Promise<boolean> {
+  return (await getStorage().readJSON<Store>(key(id))) !== null;
+}
+
 export async function saveStore(store: Store): Promise<void> {
   await getStorage().writeJSON(key(store.id), store);
 }
