@@ -397,10 +397,17 @@ export function Simulator({
             // Después de un cambio, la página abre en las piezas. El ancla sola a veces no alcanza
             // (el contenido llega por streaming), así que se asegura al terminar de cargar.
             // Se mueve solo la ventana de adentro: scrollIntoView arrastraría también la página de afuera.
+            // Se repite un instante después: al hidratar, la página de adentro a veces vuelve arriba.
             onLoad={(e) => {
               const view = e.currentTarget.contentWindow;
-              const tiles = view?.document.getElementById("piezas");
-              if (pageVersion && view && tiles) view.scrollTo({ top: tiles.getBoundingClientRect().top + view.scrollY - 8 });
+              if (!pageVersion || !view) return;
+              const toTiles = () => {
+                const tiles = view.document?.getElementById("piezas");
+                if (tiles) view.scrollTo({ top: tiles.getBoundingClientRect().top + view.scrollY - 8 });
+              };
+              toTiles();
+              setTimeout(toTiles, 350);
+              setTimeout(toTiles, 1000);
             }}
           />
         </div>
